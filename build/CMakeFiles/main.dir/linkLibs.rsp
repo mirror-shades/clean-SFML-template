@@ -1,0 +1,1 @@
+ "C:/dev/c++/testing/roguelike/external/SFML-Windows/lib/libsfml-graphics.a" "C:/dev/c++/testing/roguelike/external/SFML-Windows/lib/libsfml-window.a" "C:/dev/c++/testing/roguelike/external/SFML-Windows/lib/libsfml-system.a" -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

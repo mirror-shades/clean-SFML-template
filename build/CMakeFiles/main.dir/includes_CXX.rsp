@@ -1,0 +1,1 @@
+-IC:/dev/c++/testing/roguelike/include -I"C:/dev/c++/testing/roguelike/external/SFML-Windows/lib/cmake/SFML/../../include" -isystem "C:/dev/c++/testing/roguelike/external/SFML-Windows/include"
