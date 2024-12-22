@@ -1,5 +1,6 @@
-CMakeFiles/main.dir/src/main.cpp.obj: \
- C:\dev\c++\testing\roguelike\src\main.cpp \
+CMakeFiles/main.dir/src/engine/input.cpp.obj: \
+ C:\dev\c++\testing\roguelike\src\engine\input.cpp \
+ C:/dev/c++/testing/roguelike/include/input.h \
  C:/dev/c++/testing/roguelike/external/SFML-Windows/include/SFML/Graphics.hpp \
  C:/dev/c++/testing/roguelike/external/SFML-Windows/include/SFML/Window.hpp \
  C:/dev/c++/testing/roguelike/external/SFML-Windows/include/SFML/System.hpp \
@@ -257,14 +258,8 @@ CMakeFiles/main.dir/src/main.cpp.obj: \
  C:/dev/c++/testing/roguelike/external/SFML-Windows/include/SFML/Graphics/Sprite.hpp \
  C:/dev/c++/testing/roguelike/external/SFML-Windows/include/SFML/Graphics/Text.hpp \
  C:/dev/c++/testing/roguelike/external/SFML-Windows/include/SFML/Graphics/VertexBuffer.hpp \
- C:/mingw64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/iostream \
- C:/mingw64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/istream \
- C:/mingw64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/bits/istream.tcc \
- C:/dev/c++/testing/roguelike/include/map.h \
- C:/dev/c++/testing/roguelike/include/tile.h \
- C:/dev/c++/testing/roguelike/include/colors.h \
  C:/dev/c++/testing/roguelike/include/player.h \
  C:/dev/c++/testing/roguelike/include/monster.h \
- C:/dev/c++/testing/roguelike/include/render.h \
- C:/dev/c++/testing/roguelike/include/engine.h \
- C:/dev/c++/testing/roguelike/include/input.h
+ C:/dev/c++/testing/roguelike/include/map.h \
+ C:/dev/c++/testing/roguelike/include/tile.h \
+ C:/dev/c++/testing/roguelike/include/colors.h

@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/dev/c++/testing/roguelike/src/engine/engine.cpp" "CMakeFiles/main.dir/src/engine/engine.cpp.obj" "gcc" "CMakeFiles/main.dir/src/engine/engine.cpp.obj.d"
+  "C:/dev/c++/testing/roguelike/src/engine/input.cpp" "CMakeFiles/main.dir/src/engine/input.cpp.obj" "gcc" "CMakeFiles/main.dir/src/engine/input.cpp.obj.d"
   "C:/dev/c++/testing/roguelike/src/main.cpp" "CMakeFiles/main.dir/src/main.cpp.obj" "gcc" "CMakeFiles/main.dir/src/main.cpp.obj.d"
   "C:/dev/c++/testing/roguelike/src/map/map.cpp" "CMakeFiles/main.dir/src/map/map.cpp.obj" "gcc" "CMakeFiles/main.dir/src/map/map.cpp.obj.d"
   "C:/dev/c++/testing/roguelike/src/player/player.cpp" "CMakeFiles/main.dir/src/player/player.cpp.obj" "gcc" "CMakeFiles/main.dir/src/player/player.cpp.obj.d"

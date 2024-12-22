@@ -14,4 +14,5 @@ public:
     Tile currentMap[MAP_WIDTH][MAP_HEIGHT];
 
     Tile getCurrentTile(Player &player);
+    bool isValidMove(int x, int y);
 };

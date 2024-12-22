@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/main.dir/src/engine/engine.cpp.obj"
   "CMakeFiles/main.dir/src/engine/engine.cpp.obj.d"
+  "CMakeFiles/main.dir/src/engine/input.cpp.obj"
+  "CMakeFiles/main.dir/src/engine/input.cpp.obj.d"
   "CMakeFiles/main.dir/src/main.cpp.obj"
   "CMakeFiles/main.dir/src/main.cpp.obj.d"
   "CMakeFiles/main.dir/src/map/map.cpp.obj"

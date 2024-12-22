@@ -1,10 +1,12 @@
 #include <SFML/Graphics.hpp>
+#include <iostream>
 #include "map.h"
 #include "render.h"
 #include "tile.h"
 #include "colors.h"
 #include "engine.h"
-#include <iostream>
+#include "player.h"
+#include "input.h"
 
 Tile level1[24][16] = {
     {
@@ -137,8 +139,8 @@ Tile level1[24][16] = {
         Tile('#', Color::BLUE, false),
         Tile(' ', Color::BLUE, true),
         Tile(' ', Color::BLUE, true),
-        Tile(' ', Color::BLUE, true),
-        Tile(' ', Color::BLUE, true),
+        Tile('"', Color::BLUE, true),
+        Tile('"', Color::BLUE, true),
         Tile(' ', Color::BLUE, true),
         Tile(' ', Color::BLUE, true),
         Tile(' ', Color::BLUE, true),
@@ -155,8 +157,8 @@ Tile level1[24][16] = {
         Tile('#', Color::BLUE, false),
         Tile(' ', Color::BLUE, true),
         Tile(' ', Color::BLUE, true),
-        Tile(' ', Color::BLUE, true),
-        Tile(' ', Color::BLUE, true),
+        Tile('"', Color::BLUE, true),
+        Tile('"', Color::BLUE, true),
         Tile(' ', Color::BLUE, true),
         Tile(' ', Color::BLUE, true),
         Tile(' ', Color::BLUE, true),
@@ -440,29 +442,23 @@ Tile level1[24][16] = {
         Tile('#', Color::BLUE, false),
     }};
 
-bool isValidMove(const Map &map, int x, int y)
-{
-    // Check bounds
-    if (x < 0 || x >= 24 || y < 0 || y >= 16)
-    {
-        return false;
-    }
-    // Check if tile is walkable
-    return map.currentMap[x][y].walkable;
-}
-
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1200, 800), "SFML works!");
     Render render;
-    render.loadFont();
     Map map;
-    memcpy(map.currentMap, level1, sizeof(level1));
-    Player player = {5, 5};
     Engine engine;
-    // test map
-    bool needsUpdate = true; // Initial draw flag
+    PlayerManager playerManager;
+    InputManager inputManager;
+
+    // Initialize player position
+    playerManager.setPlayerPosition(5, 5); // Set initial position to a valid walkable tile
+
     engine.state = GAME_RUNNING;
+    render.loadFont();
+
+    memcpy(map.currentMap, level1, sizeof(level1));
+    bool needsUpdate = true;
 
     while (window.isOpen())
     {
@@ -474,25 +470,9 @@ int main()
 
             if (event.type == sf::Event::KeyPressed)
             {
-                // Store potential new position
-                int newX = player.x;
-                int newY = player.y;
-
-                if (event.key.code == sf::Keyboard::W)
-                    newY--;
-                if (event.key.code == sf::Keyboard::S)
-                    newY++;
-                if (event.key.code == sf::Keyboard::A)
-                    newX--;
-                if (event.key.code == sf::Keyboard::D)
-                    newX++;
-
-                // Only update position if the move is valid
-                if (isValidMove(map, newX, newY))
+                if (engine.state == GAME_RUNNING)
                 {
-                    player.x = newX;
-                    player.y = newY;
-                    needsUpdate = true;
+                    needsUpdate = inputManager.handleInput(event, playerManager.getPlayer(), playerManager, map);
                 }
             }
         }
@@ -501,8 +481,8 @@ int main()
         if (needsUpdate)
         {
             window.clear();
-            engine.update(map, player);
-            render.drawScreen(window, engine, map, player);
+            engine.update(map, playerManager.getPlayer());
+            render.drawScreen(window, engine, map, playerManager.getPlayer());
             window.display();
             needsUpdate = false; // Reset the flag after drawing
         }

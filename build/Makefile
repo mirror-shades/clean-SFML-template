@@ -152,6 +152,30 @@ src/engine/engine.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/src/engine/engine.cpp.s
 .PHONY : src/engine/engine.cpp.s
 
+src/engine/input.obj: src/engine/input.cpp.obj
+.PHONY : src/engine/input.obj
+
+# target to build an object file
+src/engine/input.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/src/engine/input.cpp.obj
+.PHONY : src/engine/input.cpp.obj
+
+src/engine/input.i: src/engine/input.cpp.i
+.PHONY : src/engine/input.i
+
+# target to preprocess a source file
+src/engine/input.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/src/engine/input.cpp.i
+.PHONY : src/engine/input.cpp.i
+
+src/engine/input.s: src/engine/input.cpp.s
+.PHONY : src/engine/input.s
+
+# target to generate assembly for a file
+src/engine/input.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/src/engine/input.cpp.s
+.PHONY : src/engine/input.cpp.s
+
 src/main.obj: src/main.cpp.obj
 .PHONY : src/main.obj
 
@@ -260,6 +284,9 @@ help:
 	@echo ... src/engine/engine.obj
 	@echo ... src/engine/engine.i
 	@echo ... src/engine/engine.s
+	@echo ... src/engine/input.obj
+	@echo ... src/engine/input.i
+	@echo ... src/engine/input.s
 	@echo ... src/main.obj
 	@echo ... src/main.i
 	@echo ... src/main.s

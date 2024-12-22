@@ -14,3 +14,14 @@ Tile Map::getCurrentTile(Player &player)
 {
     return currentMap[player.x][player.y];
 }
+
+bool Map::isValidMove(int x, int y)
+{
+    // Check bounds
+    if (x < 0 || x >= 24 || y < 0 || y >= 16)
+    {
+        return false;
+    }
+    // Check if tile is walkable
+    return currentMap[x][y].walkable;
+}
