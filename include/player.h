@@ -12,7 +12,7 @@ class PlayerManager
 {
 public:
     Player &getPlayer();
-    void addMonster(Monster monster);
+    void addMonster(int type, MonsterManager &monsterManager);
     void setPlayerPosition(int x, int y);
     std::pair<int, int> getPlayerPosition();
 };

@@ -224,6 +224,30 @@ src/map/map.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/src/map/map.cpp.s
 .PHONY : src/map/map.cpp.s
 
+src/monster/monster.obj: src/monster/monster.cpp.obj
+.PHONY : src/monster/monster.obj
+
+# target to build an object file
+src/monster/monster.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/src/monster/monster.cpp.obj
+.PHONY : src/monster/monster.cpp.obj
+
+src/monster/monster.i: src/monster/monster.cpp.i
+.PHONY : src/monster/monster.i
+
+# target to preprocess a source file
+src/monster/monster.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/src/monster/monster.cpp.i
+.PHONY : src/monster/monster.cpp.i
+
+src/monster/monster.s: src/monster/monster.cpp.s
+.PHONY : src/monster/monster.s
+
+# target to generate assembly for a file
+src/monster/monster.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/src/monster/monster.cpp.s
+.PHONY : src/monster/monster.cpp.s
+
 src/player/player.obj: src/player/player.cpp.obj
 .PHONY : src/player/player.obj
 
@@ -293,6 +317,9 @@ help:
 	@echo ... src/map/map.obj
 	@echo ... src/map/map.i
 	@echo ... src/map/map.s
+	@echo ... src/monster/monster.obj
+	@echo ... src/monster/monster.i
+	@echo ... src/monster/monster.s
 	@echo ... src/player/player.obj
 	@echo ... src/player/player.i
 	@echo ... src/player/player.s

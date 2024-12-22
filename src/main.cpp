@@ -7,6 +7,7 @@
 #include "engine.h"
 #include "player.h"
 #include "input.h"
+#include "monster.h"
 
 Tile level1[24][16] = {
     {
@@ -447,18 +448,25 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1200, 800), "SFML works!");
     Render render;
     Map map;
-    Engine engine;
     PlayerManager playerManager;
     InputManager inputManager;
+    MonsterManager monsterManager;
+    Engine engine;
 
-    // Initialize player position
-    playerManager.setPlayerPosition(5, 5); // Set initial position to a valid walkable tile
+    // Initialize monster types before creating any monsters
+    initializeMonsterTypes();
+
+    // Now it's safe to add monsters
+    playerManager.addMonster(1, monsterManager);
 
     engine.state = GAME_RUNNING;
     render.loadFont();
 
     memcpy(map.currentMap, level1, sizeof(level1));
     bool needsUpdate = true;
+
+    // Initialize player position
+    playerManager.setPlayerPosition(5, 5); // Set initial position to a valid walkable tile
 
     while (window.isOpen())
     {

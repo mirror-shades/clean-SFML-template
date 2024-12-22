@@ -19,7 +19,7 @@ std::pair<int, int> PlayerManager::getPlayerPosition()
     return {player.x, player.y};
 }
 
-void PlayerManager::addMonster(Monster monster)
+void PlayerManager::addMonster(int type, MonsterManager &monsterManager)
 {
-    activeMonsters.push_back(monster);
+    activeMonsters.push_back(monsterManager.createMonster(type));
 }

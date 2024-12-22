@@ -34,5 +34,11 @@
   "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -O3 -DNDEBUG -std=gnu++20 -o CMakeFiles\\main.dir\\src\\engine\\input.cpp.obj -c C:\\dev\\c++\\testing\\roguelike\\src\\engine\\input.cpp",
   "file": "C:/dev/c++/testing/roguelike/src/engine/input.cpp",
   "output": "CMakeFiles/main.dir/src/engine/input.cpp.obj"
+},
+{
+  "directory": "C:/dev/c++/testing/roguelike/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -O3 -DNDEBUG -std=gnu++20 -o CMakeFiles\\main.dir\\src\\monster\\monster.cpp.obj -c C:\\dev\\c++\\testing\\roguelike\\src\\monster\\monster.cpp",
+  "file": "C:/dev/c++/testing/roguelike/src/monster/monster.cpp",
+  "output": "CMakeFiles/main.dir/src/monster/monster.cpp.obj"
 }
 ]

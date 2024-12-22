@@ -2,6 +2,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 enum ElementType
 {
@@ -28,7 +29,7 @@ struct MonsterType
     float baseSpeed;
 };
 
-extern std::map<int, MonsterType> monsterTypes;
+extern std::vector<MonsterType> monsterTypes;
 
 // Actual monster instance
 struct Monster
@@ -52,6 +53,9 @@ struct Monster
 // Base monster types with stats divided by 10
 inline void initializeMonsterTypes()
 {
+    monsterTypes.clear();   // Clear any existing entries
+    monsterTypes.resize(5); // Resize to accommodate indices 0-4
+
     MonsterType phoenix = {
         1,         // id
         FIRE,      // element
@@ -112,6 +116,7 @@ inline void initializeMonsterTypes()
         10.0f    // baseSpeed
     };
 
+    monsterTypes[0] = MonsterType{};
     monsterTypes[1] = phoenix;
     monsterTypes[2] = leviathan;
     monsterTypes[3] = golem;
@@ -121,5 +126,6 @@ inline void initializeMonsterTypes()
 class MonsterManager
 {
 public:
-    Monster createMonster(const MonsterType &baseType);
+    Monster createMonster(int type);
+    void initializeMonsterTypes();
 };

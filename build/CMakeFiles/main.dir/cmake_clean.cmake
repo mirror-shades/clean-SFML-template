@@ -7,6 +7,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/main.dir/src/main.cpp.obj.d"
   "CMakeFiles/main.dir/src/map/map.cpp.obj"
   "CMakeFiles/main.dir/src/map/map.cpp.obj.d"
+  "CMakeFiles/main.dir/src/monster/monster.cpp.obj"
+  "CMakeFiles/main.dir/src/monster/monster.cpp.obj.d"
   "CMakeFiles/main.dir/src/player/player.cpp.obj"
   "CMakeFiles/main.dir/src/player/player.cpp.obj.d"
   "CMakeFiles/main.dir/src/render/render.cpp.obj"

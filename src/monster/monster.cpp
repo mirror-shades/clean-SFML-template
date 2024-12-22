@@ -1,8 +1,11 @@
 #include "monster.h"
 #include <random>
 
-Monster MonsterManager::createMonster(const MonsterType &baseType)
+std::vector<MonsterType> monsterTypes; // Definition
+
+Monster MonsterManager::createMonster(int type)
 {
+    MonsterType baseType = monsterTypes[type];
     // Create random number generator for values between 0.9 and 1.0
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -24,5 +27,15 @@ Monster MonsterManager::createMonster(const MonsterType &baseType)
     monster.evasion = static_cast<int>(baseType.baseEvasion * dis(gen) * 10);
     monster.speed = static_cast<int>(baseType.baseSpeed * dis(gen) * 10);
 
+    if (monsterTypes.empty())
+    {
+        initializeMonsterTypes();
+    }
+
     return monster;
+}
+
+void MonsterManager::initializeMonsterTypes()
+{
+    monsterTypes.push_back(MonsterType{});
 }
