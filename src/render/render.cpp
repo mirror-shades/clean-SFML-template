@@ -3,7 +3,6 @@
 #include "map.h"
 #include "player.h"
 #include "engine.h"
-#include "menu.h"
 
 sf::Font font;
 
@@ -55,11 +54,11 @@ void Render::drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y)
     this->drawSymbol(window, tile.symbol, x, y);
 }
 
-void Render::drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Player &player)
+void Render::drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Player &player, Menu &menu, std::vector<std::string> options)
 {
     if (engine.state == GAME_MENU)
     {
-        drawMenu(window);
+        drawMenu(window, menu, options);
     }
     if (engine.state == GAME_RUNNING)
     {
@@ -68,12 +67,30 @@ void Render::drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Play
     }
 }
 
-void Render::drawMenu(sf::RenderWindow &window)
+void Render::drawMenu(sf::RenderWindow &window, Menu &menu, std::vector<std::string> options)
 {
-    sf::Text text("Menu", font);
-    text.setCharacterSize(Map::SQUARE_SIZE);
-    text.setPosition(0, 0);
-    window.draw(text);
+    const int SPACING = Map::SQUARE_SIZE * 2; // Space between options
+    const int START_X = 100;                  // Starting X position
+    const int START_Y = 100;                  // Y position for all options
+
+    for (size_t i = 0; i < options.size(); i++)
+    {
+        sf::Text text(options[i], font);
+        text.setCharacterSize(Map::SQUARE_SIZE);
+        text.setPosition(START_X, START_Y + (i * SPACING));
+
+        // Highlight the current selection
+        if (i == menu.selection)
+        {
+            text.setFillColor(sf::Color::Yellow); // Or any highlight color you prefer
+        }
+        else
+        {
+            text.setFillColor(sf::Color::White);
+        }
+
+        window.draw(text);
+    }
 }
 
 void Render::drawMap(sf::RenderWindow &window, const Map &map)

@@ -8,6 +8,7 @@
 #include "player.h"
 #include "input.h"
 #include "monster.h"
+#include "menu.h"
 
 Tile level1[24][16] = {
     {
@@ -445,7 +446,7 @@ Tile level1[24][16] = {
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1200, 800), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode(1200, 800), "");
     Render render;
     Map map;
     Engine engine;
@@ -453,10 +454,13 @@ int main()
     InputManager inputManager;
     MonsterManager monsterManager;
     Environment environment;
+    Menu menu;
+    std::vector<std::string> options = {"Start Game", "Options", "Exit"};
     // Initialize monster types before creating any monsters
     initializeMonsterTypes();
+    menu.selection = 0;
 
-    engine.state = GAME_RUNNING;
+    engine.state = GAME_MENU;
     render.loadFont();
 
     memcpy(map.currentMap, level1, sizeof(level1));
@@ -482,21 +486,17 @@ int main()
 
             if (event.type == sf::Event::KeyPressed)
             {
-                if (engine.state == GAME_RUNNING)
-                {
-                    needsUpdate = inputManager.handleInput(event, playerManager.getPlayer(), playerManager, map);
-                }
+                needsUpdate = inputManager.handleInput(event, playerManager.getPlayer(), playerManager, map, engine, menu, options);
             }
         }
 
-        // Only draw if update is needed
         if (needsUpdate)
         {
             window.clear();
             engine.update(map, playerManager.getPlayer(), environment, monsterManager);
-            render.drawScreen(window, engine, map, playerManager.getPlayer());
+            render.drawScreen(window, engine, map, playerManager.getPlayer(), menu, options);
             window.display();
-            needsUpdate = false; // Reset the flag after drawing
+            needsUpdate = false;
         }
     }
 

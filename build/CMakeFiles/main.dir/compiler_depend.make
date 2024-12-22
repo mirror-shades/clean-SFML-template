@@ -282,8 +282,10 @@ CMakeFiles/main.dir/src/engine/input.cpp.obj: C:/dev/c++/testing/roguelike/src/e
   C:/dev/c++/testing/roguelike/external/SFML-Windows/include/SFML/Window/WindowHandle.hpp \
   C:/dev/c++/testing/roguelike/external/SFML-Windows/include/SFML/Window/WindowStyle.hpp \
   C:/dev/c++/testing/roguelike/include/colors.h \
+  C:/dev/c++/testing/roguelike/include/engine.h \
   C:/dev/c++/testing/roguelike/include/input.h \
   C:/dev/c++/testing/roguelike/include/map.h \
+  C:/dev/c++/testing/roguelike/include/menu.h \
   C:/dev/c++/testing/roguelike/include/monster.h \
   C:/dev/c++/testing/roguelike/include/player.h \
   C:/dev/c++/testing/roguelike/include/tile.h \
@@ -550,6 +552,7 @@ CMakeFiles/main.dir/src/main.cpp.obj: C:/dev/c++/testing/roguelike/src/main.cpp 
   C:/dev/c++/testing/roguelike/include/engine.h \
   C:/dev/c++/testing/roguelike/include/input.h \
   C:/dev/c++/testing/roguelike/include/map.h \
+  C:/dev/c++/testing/roguelike/include/menu.h \
   C:/dev/c++/testing/roguelike/include/monster.h \
   C:/dev/c++/testing/roguelike/include/player.h \
   C:/dev/c++/testing/roguelike/include/render.h \
@@ -1309,6 +1312,7 @@ CMakeFiles/main.dir/src/render/render.cpp.obj: C:/dev/c++/testing/roguelike/src/
   C:/dev/c++/testing/roguelike/include/colors.h \
   C:/dev/c++/testing/roguelike/include/engine.h \
   C:/dev/c++/testing/roguelike/include/map.h \
+  C:/dev/c++/testing/roguelike/include/menu.h \
   C:/dev/c++/testing/roguelike/include/monster.h \
   C:/dev/c++/testing/roguelike/include/player.h \
   C:/dev/c++/testing/roguelike/include/render.h \
@@ -2085,6 +2089,8 @@ C:/dev/c++/testing/roguelike/external/SFML-Windows/include/SFML/Window/Touch.hpp
 C:/dev/c++/testing/roguelike/external/SFML-Windows/include/SFML/Window/VideoMode.hpp:
 
 C:/dev/c++/testing/roguelike/external/SFML-Windows/include/SFML/Window/WindowBase.hpp:
+
+C:/dev/c++/testing/roguelike/include/menu.h:
 
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/bits/algorithmfwd.h:
 

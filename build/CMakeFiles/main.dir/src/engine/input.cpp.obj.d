@@ -262,4 +262,6 @@ CMakeFiles/main.dir/src/engine/input.cpp.obj: \
  C:/dev/c++/testing/roguelike/include/monster.h \
  C:/dev/c++/testing/roguelike/include/map.h \
  C:/dev/c++/testing/roguelike/include/tile.h \
- C:/dev/c++/testing/roguelike/include/colors.h
+ C:/dev/c++/testing/roguelike/include/colors.h \
+ C:/dev/c++/testing/roguelike/include/menu.h \
+ C:/dev/c++/testing/roguelike/include/engine.h
