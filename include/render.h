@@ -18,4 +18,5 @@ private:
     void drawMap(sf::RenderWindow &window, const Map &map);
     void drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y);
     void drawSymbol(sf::RenderWindow &window, char symbol, int x, int y);
+    void drawMenu(sf::RenderWindow &window);
 };

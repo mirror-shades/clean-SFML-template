@@ -263,4 +263,5 @@ CMakeFiles/main.dir/src/render/render.cpp.obj: \
  C:/dev/c++/testing/roguelike/include/map.h \
  C:/dev/c++/testing/roguelike/include/player.h \
  C:/dev/c++/testing/roguelike/include/monster.h \
- C:/dev/c++/testing/roguelike/include/engine.h
+ C:/dev/c++/testing/roguelike/include/engine.h \
+ C:/dev/c++/testing/roguelike/include/menu.h

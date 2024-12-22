@@ -3,6 +3,8 @@
 #include "map.h"
 #include "player.h"
 #include "engine.h"
+#include "menu.h"
+
 sf::Font font;
 
 void Render::loadFont()
@@ -55,11 +57,23 @@ void Render::drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y)
 
 void Render::drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Player &player)
 {
+    if (engine.state == GAME_MENU)
+    {
+        drawMenu(window);
+    }
     if (engine.state == GAME_RUNNING)
     {
         drawMap(window, map);
         drawPlayer(window, player);
     }
+}
+
+void Render::drawMenu(sf::RenderWindow &window)
+{
+    sf::Text text("Menu", font);
+    text.setCharacterSize(Map::SQUARE_SIZE);
+    text.setPosition(0, 0);
+    window.draw(text);
 }
 
 void Render::drawMap(sf::RenderWindow &window, const Map &map)

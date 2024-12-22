@@ -1,5 +1,6 @@
 #include <vector>
 #include <utility>
+#include <iostream>
 #include "player.h"
 #include "monster.h"
 
@@ -21,5 +22,11 @@ std::pair<int, int> PlayerManager::getPlayerPosition()
 
 void PlayerManager::addMonster(int type, MonsterManager &monsterManager)
 {
+    std::cout << "Adding monster type " << type << " at line " << __LINE__ << std::endl;
     activeMonsters.push_back(monsterManager.createMonster(type));
+}
+
+std::vector<Monster> PlayerManager::getActiveMonsters()
+{
+    return activeMonsters;
 }

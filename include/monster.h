@@ -116,7 +116,6 @@ inline void initializeMonsterTypes()
         10.0f    // baseSpeed
     };
 
-    monsterTypes[0] = MonsterType{};
     monsterTypes[1] = phoenix;
     monsterTypes[2] = leviathan;
     monsterTypes[3] = golem;
@@ -128,4 +127,5 @@ class MonsterManager
 public:
     Monster createMonster(int type);
     void initializeMonsterTypes();
+    void printMonster(Monster monster);
 };

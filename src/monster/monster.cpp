@@ -1,5 +1,6 @@
-#include "monster.h"
 #include <random>
+#include <iostream>
+#include "monster.h"
 
 std::vector<MonsterType> monsterTypes; // Definition
 
@@ -38,4 +39,18 @@ Monster MonsterManager::createMonster(int type)
 void MonsterManager::initializeMonsterTypes()
 {
     monsterTypes.push_back(MonsterType{});
+}
+
+void MonsterManager::printMonster(Monster monster)
+{
+    std::cout << "Monster: " << monster.name << std::endl;
+    std::cout << "Health: " << monster.health << std::endl;
+    std::cout << "Attack: " << monster.attack << std::endl;
+    std::cout << "Special Attack: " << monster.specialAttack << std::endl;
+    std::cout << "Defense: " << monster.defense << std::endl;
+    std::cout << "Special Defense: " << monster.specialDefense << std::endl;
+    std::cout << "Magic: " << monster.magic << std::endl;
+    std::cout << "Accuracy: " << monster.accuracy << std::endl;
+    std::cout << "Evasion: " << monster.evasion << std::endl;
+    std::cout << "Speed: " << monster.speed << std::endl;
 }

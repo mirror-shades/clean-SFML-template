@@ -2,6 +2,15 @@
 
 bool InputManager::handleInput(sf::Event event, Player &player, PlayerManager &playerManager, Map &map)
 {
+    if (event.type == sf::Event::KeyPressed)
+    {
+        return movePlayer(event, player, playerManager, map);
+    }
+    return false;
+}
+
+bool InputManager::movePlayer(sf::Event event, Player &player, PlayerManager &playerManager, Map &map)
+{
     // Store potential new position
     auto [newX, newY] = playerManager.getPlayerPosition();
 

@@ -7,4 +7,5 @@ class InputManager
 {
 public:
     bool handleInput(sf::Event event, Player &player, PlayerManager &playerManager, Map &map);
+    bool movePlayer(sf::Event event, Player &player, PlayerManager &playerManager, Map &map);
 };

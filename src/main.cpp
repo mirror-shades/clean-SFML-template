@@ -448,16 +448,13 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1200, 800), "SFML works!");
     Render render;
     Map map;
+    Engine engine;
     PlayerManager playerManager;
     InputManager inputManager;
     MonsterManager monsterManager;
-    Engine engine;
-
+    Environment environment;
     // Initialize monster types before creating any monsters
     initializeMonsterTypes();
-
-    // Now it's safe to add monsters
-    playerManager.addMonster(1, monsterManager);
 
     engine.state = GAME_RUNNING;
     render.loadFont();
@@ -467,6 +464,13 @@ int main()
 
     // Initialize player position
     playerManager.setPlayerPosition(5, 5); // Set initial position to a valid walkable tile
+    playerManager.addMonster(1, monsterManager);
+
+    // debug print active monsters
+    for (Monster monster : playerManager.getActiveMonsters())
+    {
+        monsterManager.printMonster(monster);
+    }
 
     while (window.isOpen())
     {
@@ -489,7 +493,7 @@ int main()
         if (needsUpdate)
         {
             window.clear();
-            engine.update(map, playerManager.getPlayer());
+            engine.update(map, playerManager.getPlayer(), environment, monsterManager);
             render.drawScreen(window, engine, map, playerManager.getPlayer());
             window.display();
             needsUpdate = false; // Reset the flag after drawing
