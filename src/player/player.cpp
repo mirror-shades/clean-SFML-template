@@ -1,32 +1,28 @@
-#include <vector>
-#include <utility>
-#include <iostream>
 #include "player.h"
-#include "monster.h"
+#include <iostream>
 
-Player player = {0, 0};
-std::vector<Monster> activeMonsters;
-
-Player &PlayerManager::getPlayer() { return player; }
-
-void PlayerManager::setPlayerPosition(int x, int y)
+void Player::setPosition(int newX, int newY)
 {
-    player.x = x;
-    player.y = y;
+    x = newX;
+    y = newY;
 }
 
-std::pair<int, int> PlayerManager::getPlayerPosition()
+std::pair<int, int> Player::getPosition() const
 {
-    return {player.x, player.y};
+    return {x, y};
 }
 
-void PlayerManager::addMonster(int type, MonsterManager &monsterManager)
+void Player::addMonster(int type, MonsterManager &monsterManager)
 {
-    std::cout << "Adding monster type " << type << " at line " << __LINE__ << std::endl;
     activeMonsters.push_back(monsterManager.createMonster(type));
 }
 
-std::vector<Monster> PlayerManager::getActiveMonsters()
+const std::vector<Monster> &Player::getActiveMonsters() const
 {
     return activeMonsters;
+}
+
+Monster &Player::getActiveMonster(size_t index)
+{
+    return activeMonsters[index];
 }

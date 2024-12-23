@@ -20,7 +20,7 @@ void Engine::update(Map &map, Player &player, Environment &environment, MonsterM
         {
             std::cout << "Monster encountered!" << std::endl;
             environment.enemyMonsters.push_back(monsterManager.createMonster((dis(gen) % 4) + 1));
-            monsterManager.printMonster(environment.enemyMonsters.back());
+            state = GAME_MONSTER_ENCOUNTERED;
         }
     }
 }

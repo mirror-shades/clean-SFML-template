@@ -23,7 +23,7 @@ void Render::drawBackground(sf::RenderWindow &window)
 
 void Render::drawPlayer(sf::RenderWindow &window, Player &player)
 {
-    drawSymbol(window, '@', player.x, player.y);
+    drawSymbol(window, '@', player.getPosition().first, player.getPosition().second);
 }
 
 void Render::drawSymbol(sf::RenderWindow &window, const char symbol, int x, int y)
@@ -54,20 +54,39 @@ void Render::drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y)
     this->drawSymbol(window, tile.symbol, x, y);
 }
 
-void Render::drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Player &player, Menu &menu, std::vector<std::string> options)
+void Render::drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Player &player, MonsterManager &monsterManager, Environment &environment, std::vector<std::string> options, int selection)
 {
     if (engine.state == GAME_MENU)
     {
-        drawMenu(window, menu, options);
+        drawMenu(window, options, selection);
     }
     if (engine.state == GAME_RUNNING)
     {
         drawMap(window, map);
         drawPlayer(window, player);
     }
+    if (engine.state == GAME_MONSTER_ENCOUNTERED)
+    {
+        drawBattle(window, player, monsterManager, environment);
+    }
 }
 
-void Render::drawMenu(sf::RenderWindow &window, Menu &menu, std::vector<std::string> options)
+void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Environment &environment)
+{
+    // just write the name of the most recent monster in the enviroment to the screen
+    sf::Text text(environment.enemyMonsters.back().name, font);
+    text.setCharacterSize(Map::SQUARE_SIZE);
+    text.setPosition(100, 100);
+    window.draw(text);
+
+    std::vector<Monster> activeMonsters = player.getActiveMonsters();
+    sf::Text text2(activeMonsters.back().name, font);
+    text2.setCharacterSize(Map::SQUARE_SIZE);
+    text2.setPosition(100, 200);
+    window.draw(text2);
+}
+
+void Render::drawMenu(sf::RenderWindow &window, std::vector<std::string> options, int &selection)
 {
     const int SPACING = Map::SQUARE_SIZE * 2; // Space between options
     const int START_X = 100;                  // Starting X position
@@ -80,7 +99,7 @@ void Render::drawMenu(sf::RenderWindow &window, Menu &menu, std::vector<std::str
         text.setPosition(START_X, START_Y + (i * SPACING));
 
         // Highlight the current selection
-        if (i == menu.selection)
+        if (i == selection)
         {
             text.setFillColor(sf::Color::Yellow); // Or any highlight color you prefer
         }

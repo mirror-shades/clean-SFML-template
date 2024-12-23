@@ -12,7 +12,7 @@ Tile currentMap[MAP_WIDTH][MAP_HEIGHT] = {};
 // get current tile based on player position
 Tile Map::getCurrentTile(Player &player)
 {
-    return currentMap[player.x][player.y];
+    return currentMap[player.getPosition().first][player.getPosition().second];
 }
 
 bool Map::isValidMove(int x, int y)

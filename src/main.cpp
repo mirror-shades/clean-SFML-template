@@ -8,7 +8,6 @@
 #include "player.h"
 #include "input.h"
 #include "monster.h"
-#include "menu.h"
 
 Tile level1[24][16] = {
     {
@@ -450,16 +449,14 @@ int main()
     Render render;
     Map map;
     Engine engine;
-    PlayerManager playerManager;
+    Player player;
     InputManager inputManager;
     MonsterManager monsterManager;
     Environment environment;
-    Menu menu;
-    std::vector<std::string> options = {"Start Game", "Options", "Exit"};
+    std::vector<std::string> options = {"Fire", "Water", "Earth", "Air"};
     // Initialize monster types before creating any monsters
     initializeMonsterTypes();
-    menu.selection = 0;
-
+    render.selection = 0;
     engine.state = GAME_MENU;
     render.loadFont();
 
@@ -467,11 +464,10 @@ int main()
     bool needsUpdate = true;
 
     // Initialize player position
-    playerManager.setPlayerPosition(5, 5); // Set initial position to a valid walkable tile
-    playerManager.addMonster(1, monsterManager);
+    player.setPosition(5, 5); // Set initial position to a valid walkable tile
 
     // debug print active monsters
-    for (Monster monster : playerManager.getActiveMonsters())
+    for (Monster monster : player.getActiveMonsters())
     {
         monsterManager.printMonster(monster);
     }
@@ -486,15 +482,15 @@ int main()
 
             if (event.type == sf::Event::KeyPressed)
             {
-                needsUpdate = inputManager.handleInput(event, playerManager.getPlayer(), playerManager, map, engine, menu, options);
+                needsUpdate = inputManager.handleInput(event, player, monsterManager, map, engine, options, render.selection);
             }
         }
 
         if (needsUpdate)
         {
             window.clear();
-            engine.update(map, playerManager.getPlayer(), environment, monsterManager);
-            render.drawScreen(window, engine, map, playerManager.getPlayer(), menu, options);
+            engine.update(map, player, environment, monsterManager);
+            render.drawScreen(window, engine, map, player, monsterManager, environment, options, render.selection);
             window.display();
             needsUpdate = false;
         }

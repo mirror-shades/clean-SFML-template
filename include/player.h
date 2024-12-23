@@ -1,19 +1,20 @@
 #pragma once
 
+#include <vector>
+#include <utility>
 #include "monster.h"
 
-struct Player
+class Player
 {
-    int x;
-    int y;
-};
+private:
+    int x = 0;
+    int y = 0;
+    std::vector<Monster> activeMonsters;
 
-class PlayerManager
-{
 public:
-    Player &getPlayer();
+    void setPosition(int newX, int newY);
+    std::pair<int, int> getPosition() const;
     void addMonster(int type, MonsterManager &monsterManager);
-    std::vector<Monster> getActiveMonsters();
-    void setPlayerPosition(int x, int y);
-    std::pair<int, int> getPlayerPosition();
+    const std::vector<Monster> &getActiveMonsters() const;
+    Monster &getActiveMonster(size_t index);
 };

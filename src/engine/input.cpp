@@ -1,21 +1,21 @@
+#include <iostream>
 #include "input.h"
 #include "engine.h"
-#include "menu.h"
 
-bool InputManager::handleInput(sf::Event event, Player &player, PlayerManager &playerManager, Map &map, Engine &engine, Menu &menu, std::vector<std::string> options)
+bool InputManager::handleInput(sf::Event event, Player &player, MonsterManager &monsterManager, Map &map, Engine &engine, std::vector<std::string> options, int &selection)
 {
     if (event.type == sf::Event::KeyPressed)
     {
         if (engine.state == GAME_RUNNING)
         {
-            return movePlayer(event, player, playerManager, map);
+            return movePlayer(event, player, map);
         }
         if (engine.state == GAME_MENU)
         {
-            if (moveMenu(event, menu, options))
+            if (moveMenu(event, selection, options))
             {
                 // menu selected
-                // handleMenuSelection(options[menu.selection]);
+                handleMenuSelection(options[selection], player, monsterManager);
                 engine.state = GAME_RUNNING;
             }
             return true;
@@ -24,29 +24,49 @@ bool InputManager::handleInput(sf::Event event, Player &player, PlayerManager &p
     return false;
 }
 
-bool InputManager::moveMenu(sf::Event event, Menu &menu, std::vector<std::string> options)
+void InputManager::handleMenuSelection(std::string selection, Player &player, MonsterManager &monsterManager)
+{
+    if (selection == "Fire")
+    {
+        player.addMonster(1, monsterManager);
+    }
+    else if (selection == "Water")
+    {
+        player.addMonster(2, monsterManager);
+    }
+    else if (selection == "Earth")
+    {
+        player.addMonster(3, monsterManager);
+    }
+    else if (selection == "Air")
+    {
+        player.addMonster(4, monsterManager);
+    }
+}
+
+bool InputManager::moveMenu(sf::Event event, int &selection, std::vector<std::string> options)
 {
     if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
-        menu.selection = updateSelection(options.size(), -1, menu);
+        selection = updateSelection(options.size(), -1, selection);
     if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
-        menu.selection = updateSelection(options.size(), 1, menu);
+        selection = updateSelection(options.size(), 1, selection);
     if (event.key.code == sf::Keyboard::Enter or event.key.code == sf::Keyboard::Space)
         return true;
     return false;
 }
 
-int InputManager::updateSelection(int options, int change, Menu &menu)
+int InputManager::updateSelection(int options, int change, int &selection)
 {
-    int newSelection = (menu.selection + change) % options;
+    int newSelection = (selection + change) % options;
     if (newSelection < 0)
         newSelection = options - 1;
     return newSelection;
 }
 
-bool InputManager::movePlayer(sf::Event event, Player &player, PlayerManager &playerManager, Map &map)
+bool InputManager::movePlayer(sf::Event event, Player &player, Map &map)
 {
     // Store potential new position
-    auto [newX, newY] = playerManager.getPlayerPosition();
+    auto [newX, newY] = player.getPosition();
 
     if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
         newY--;
@@ -60,7 +80,7 @@ bool InputManager::movePlayer(sf::Event event, Player &player, PlayerManager &pl
     // Only update position if the move is valid
     if (map.isValidMove(newX, newY))
     {
-        playerManager.setPlayerPosition(newX, newY);
+        player.setPosition(newX, newY);
         return true;
     }
     else
