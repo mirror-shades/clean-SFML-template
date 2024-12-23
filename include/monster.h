@@ -12,7 +12,31 @@ enum ElementType
     AIR
 };
 
-// Base monster type definition
+enum MoveName
+{
+    SPARK,
+    CLOD,
+    DRIP,
+    BREEZE
+};
+
+enum MoveType
+{
+    PHYSICAL,
+    SPECIAL,
+    STATUS
+};
+
+struct Move
+{
+    MoveName name;
+    MoveType type;
+    ElementType element;
+    int power;
+    int accuracy;
+    std::string moveName;
+};
+
 struct MonsterType
 {
     int id;
@@ -27,11 +51,12 @@ struct MonsterType
     float baseAccuracy;
     float baseEvasion;
     float baseSpeed;
+    int initialMove;
 };
 
 extern std::vector<MonsterType> monsterTypes;
+extern std::vector<Move> moveTypes;
 
-// Actual monster instance
 struct Monster
 {
     int id;
@@ -46,14 +71,23 @@ struct Monster
     int accuracy;
     int evasion;
     int speed;
-    int x;
-    int y;
+    std::vector<Move> moves;
 };
+
+inline void initializeMoveTypes()
+{
+    moveTypes.clear();
+    moveTypes.resize(5);
+    moveTypes[1] = {SPARK, SPECIAL, FIRE, 80, 95, "Spark"};
+    moveTypes[2] = {CLOD, PHYSICAL, EARTH, 90, 85, "Clod"};
+    moveTypes[3] = {DRIP, SPECIAL, WATER, 75, 100, "Drip"};
+    moveTypes[4] = {BREEZE, STATUS, AIR, 0, 90, "Breeze"};
+}
 
 // Base monster types with stats divided by 10
 inline void initializeMonsterTypes()
 {
-    monsterTypes.clear();   // Clear any existing entries
+    monsterTypes.clear();
     monsterTypes.resize(5); // Resize to accommodate indices 0-4
 
     MonsterType phoenix = {
@@ -68,8 +102,8 @@ inline void initializeMonsterTypes()
         8.5f,      // baseMagic
         8.0f,      // baseAccuracy
         7.5f,      // baseEvasion
-        9.0f       // baseSpeed
-    };
+        9.0f,      // baseSpeed
+        1};
 
     MonsterType leviathan = {
         2,           // id
@@ -83,8 +117,8 @@ inline void initializeMonsterTypes()
         7.5f,        // baseMagic
         8.5f,        // baseAccuracy
         7.0f,        // baseEvasion
-        6.5f         // baseSpeed
-    };
+        6.5f,        // baseSpeed
+        2};
 
     MonsterType golem = {
         3,       // id
@@ -98,8 +132,8 @@ inline void initializeMonsterTypes()
         4.5f,    // baseMagic
         7.0f,    // baseAccuracy
         4.0f,    // baseEvasion
-        3.0f     // baseSpeed
-    };
+        3.0f,    // baseSpeed
+        3};
 
     MonsterType sylph = {
         4,       // id
@@ -113,8 +147,8 @@ inline void initializeMonsterTypes()
         9.5f,    // baseMagic
         9.5f,    // baseAccuracy
         10.0f,   // baseEvasion
-        10.0f    // baseSpeed
-    };
+        10.0f,   // baseSpeed
+        4};
 
     monsterTypes[1] = phoenix;
     monsterTypes[2] = leviathan;
@@ -128,4 +162,5 @@ public:
     Monster createMonster(int type);
     void initializeMonsterTypes();
     void printMonster(Monster monster);
+    void initializeMoveTypes();
 };

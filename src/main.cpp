@@ -455,7 +455,8 @@ int main()
     Environment environment;
     std::vector<std::string> options = {"Fire", "Water", "Earth", "Air"};
     // Initialize monster types before creating any monsters
-    initializeMonsterTypes();
+    monsterManager.initializeMoveTypes();
+    monsterManager.initializeMonsterTypes();
     render.selection = 0;
     engine.state = GAME_MENU;
     render.loadFont();
@@ -465,12 +466,6 @@ int main()
 
     // Initialize player position
     player.setPosition(5, 5); // Set initial position to a valid walkable tile
-
-    // debug print active monsters
-    for (Monster monster : player.getActiveMonsters())
-    {
-        monsterManager.printMonster(monster);
-    }
 
     while (window.isOpen())
     {
@@ -482,6 +477,10 @@ int main()
 
             if (event.type == sf::Event::KeyPressed)
             {
+                if (player.getActiveMonsters().size() > 0)
+                {
+                    monsterManager.printMonster(player.getActiveMonster(0));
+                }
                 needsUpdate = inputManager.handleInput(event, player, monsterManager, map, engine, options, render.selection);
             }
         }

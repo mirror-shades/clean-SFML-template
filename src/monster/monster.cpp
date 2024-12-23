@@ -2,7 +2,8 @@
 #include <iostream>
 #include "monster.h"
 
-std::vector<MonsterType> monsterTypes; // Definition
+std::vector<MonsterType> monsterTypes;
+std::vector<Move> moveTypes;
 
 Monster MonsterManager::createMonster(int type)
 {
@@ -27,18 +28,19 @@ Monster MonsterManager::createMonster(int type)
     monster.accuracy = static_cast<int>(baseType.baseAccuracy * dis(gen) * 10);
     monster.evasion = static_cast<int>(baseType.baseEvasion * dis(gen) * 10);
     monster.speed = static_cast<int>(baseType.baseSpeed * dis(gen) * 10);
-
-    if (monsterTypes.empty())
-    {
-        initializeMonsterTypes();
-    }
+    monster.moves.push_back(moveTypes[baseType.initialMove]);
 
     return monster;
 }
 
 void MonsterManager::initializeMonsterTypes()
 {
-    monsterTypes.push_back(MonsterType{});
+    ::initializeMonsterTypes();
+}
+
+void MonsterManager::initializeMoveTypes()
+{
+    ::initializeMoveTypes();
 }
 
 void MonsterManager::printMonster(Monster monster)
@@ -53,4 +55,8 @@ void MonsterManager::printMonster(Monster monster)
     std::cout << "Accuracy: " << monster.accuracy << std::endl;
     std::cout << "Evasion: " << monster.evasion << std::endl;
     std::cout << "Speed: " << monster.speed << std::endl;
+    for (Move move : monster.moves)
+    {
+        std::cout << "Move: " << move.name << std::endl;
+    }
 }
