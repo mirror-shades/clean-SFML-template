@@ -6,7 +6,7 @@
 
 std::vector<std::string> menuOptions;
 
-void Engine::update(Map &map, Player &player, Environment &environment, MonsterManager &monsterManager)
+void Engine::update(MapHandler &map, Player &player, Environment &environment, MonsterManager &monsterManager)
 {
     // random seed
     std::random_device rd;
@@ -15,7 +15,7 @@ void Engine::update(Map &map, Player &player, Environment &environment, MonsterM
     // check to see what tile the player is on
     // if the tile is " they are on grass
     // return a cout statement saying they are on grass
-    if (map.getCurrentTile(player).symbol == '"')
+    if (map.getCurrentTile(player.getPosition().first, player.getPosition().second).symbol == '"')
     {
         // if the player is on grass, they have a 15% chance to encounter a monster
         if ((dis(gen) % 100) < 15)

@@ -2,7 +2,7 @@
 #include "input.h"
 #include "engine.h"
 
-bool InputManager::handleInput(sf::Event event, Player &player, MonsterManager &monsterManager, Map &map, Engine &engine, int &selection)
+bool InputManager::handleInput(sf::Event event, Player &player, MonsterManager &monsterManager, MapHandler &map, Engine &engine, int &selection)
 {
     if (event.type == sf::Event::KeyPressed)
     {
@@ -98,7 +98,7 @@ int InputManager::updateSelection(int options, int change, int &selection)
     return newSelection;
 }
 
-bool InputManager::movePlayer(sf::Event event, Player &player, Map &map)
+bool InputManager::movePlayer(sf::Event event, Player &player, MapHandler &map)
 {
     // Store potential new position
     auto [newX, newY] = player.getPosition();

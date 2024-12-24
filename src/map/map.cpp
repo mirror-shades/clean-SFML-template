@@ -4,24 +4,37 @@
 
 #define SQUARE_SIZE 50
 
-const int MAP_WIDTH = 24;
-const int MAP_HEIGHT = 16;
-
 Tile currentMap[MAP_WIDTH][MAP_HEIGHT] = {};
 
 // get current tile based on player position
-Tile Map::getCurrentTile(Player &player)
+Tile MapHandler::getCurrentTile(int x, int y) const
 {
-    return currentMap[player.getPosition().first][player.getPosition().second];
+    return currentMap.tiles[x][y];
 }
 
-bool Map::isValidMove(int x, int y)
+void MapHandler::setCurrentMap(Map newMap)
+{
+    for (int i = 0; i < MAP_WIDTH; i++)
+    {
+        for (int j = 0; j < MAP_HEIGHT; j++)
+        {
+            currentMap.tiles[i][j] = newMap.tiles[i][j];
+        }
+    }
+}
+
+Map *MapHandler::getCurrentMap()
+{
+    return &currentMap;
+}
+
+bool MapHandler::isValidMove(int x, int y) const
 {
     // Check bounds
-    if (x < 0 || x >= 24 || y < 0 || y >= 16)
+    if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
     {
         return false;
     }
     // Check if tile is walkable
-    return currentMap[x][y].walkable;
+    return currentMap.tiles[x][y].walkable;
 }

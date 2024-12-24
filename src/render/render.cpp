@@ -33,15 +33,15 @@ void Render::drawSymbol(sf::RenderWindow &window, const char symbol, int x, int 
     int offset = 0;
     if (symbol == '"')
         offset = 14; // move grass down a quarter of the square size
-    text.setCharacterSize(Map::SQUARE_SIZE);
-    text.setPosition(x * Map::SQUARE_SIZE, y * Map::SQUARE_SIZE + offset);
+    text.setCharacterSize(SQUARE_SIZE);
+    text.setPosition(x * SQUARE_SIZE, y * SQUARE_SIZE + offset);
     window.draw(text);
 }
 
 void Render::drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y)
 {
     // Draw background
-    sf::RectangleShape background(sf::Vector2f(Map::SQUARE_SIZE, Map::SQUARE_SIZE));
+    sf::RectangleShape background(sf::Vector2f(SQUARE_SIZE, SQUARE_SIZE));
     // this magic is needed to convert the color from 0xRRGGBB to sf::Color for SFML
     // this format is a split hex value, (0x00, 0x00, 0x00) for black, ect
     const sf::Color squareColor = sf::Color(
@@ -50,12 +50,12 @@ void Render::drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y)
         (static_cast<int>(tile.color) & 0x3) * 64         // Blue  (bits 0-1)
     );
     background.setFillColor(squareColor);
-    background.setPosition(x * Map::SQUARE_SIZE, y * Map::SQUARE_SIZE);
+    background.setPosition(x * SQUARE_SIZE, y * SQUARE_SIZE);
     window.draw(background);
     this->drawSymbol(window, tile.symbol, x, y);
 }
 
-void Render::drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Player &player, MonsterManager &monsterManager, Environment &environment, int selection)
+void Render::drawScreen(sf::RenderWindow &window, Engine &engine, MapHandler &map, Player &player, MonsterManager &monsterManager, Environment &environment, int selection)
 {
 
     if (engine.getState() == GAME_MAIN_MENU)
@@ -75,8 +75,8 @@ void Render::drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Play
 
 void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Engine &engine, Environment &environment, int &selection)
 {
-    int screenWidth = Map::MAP_WIDTH * Map::SQUARE_SIZE;
-    int screenHeight = Map::MAP_HEIGHT * Map::SQUARE_SIZE;
+    int screenWidth = MAP_WIDTH * SQUARE_SIZE;
+    int screenHeight = MAP_HEIGHT * SQUARE_SIZE;
 
     std::string move1 = engine.menuOptions[0];
     std::string move2 = engine.menuOptions[1];
@@ -84,9 +84,9 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager
     std::string switchMonster = engine.menuOptions[3];
 
     sf::Text text(move1, font);
-    text.setCharacterSize(Map::SQUARE_SIZE);
+    text.setCharacterSize(SQUARE_SIZE);
     text.setPosition(screenWidth / 2 - text.getLocalBounds().width / 2,
-                     screenHeight * 3 / 4 - Map::SQUARE_SIZE * 2);
+                     screenHeight * 3 / 4 - SQUARE_SIZE * 2);
     if (selection == 0)
     {
         text.setFillColor(sf::Color::Yellow);
@@ -98,7 +98,7 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager
     window.draw(text);
 
     sf::Text text2(move2, font);
-    text2.setCharacterSize(Map::SQUARE_SIZE);
+    text2.setCharacterSize(SQUARE_SIZE);
     text2.setPosition(screenWidth * 1 / 4 - text2.getLocalBounds().width / 2,
                       screenHeight * 3 / 4);
     if (selection == 1)
@@ -112,7 +112,7 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager
     window.draw(text2);
 
     sf::Text text3(move3, font);
-    text3.setCharacterSize(Map::SQUARE_SIZE);
+    text3.setCharacterSize(SQUARE_SIZE);
     text3.setPosition(screenWidth * 3 / 4 - text3.getLocalBounds().width / 2,
                       screenHeight * 3 / 4);
     if (selection == 2)
@@ -126,9 +126,9 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager
     window.draw(text3);
 
     sf::Text text4(switchMonster, font);
-    text4.setCharacterSize(Map::SQUARE_SIZE);
+    text4.setCharacterSize(SQUARE_SIZE);
     text4.setPosition(screenWidth / 2 - text4.getLocalBounds().width / 2,
-                      screenHeight * 3 / 4 + Map::SQUARE_SIZE);
+                      screenHeight * 3 / 4 + SQUARE_SIZE);
     if (selection == 3)
     {
         text4.setFillColor(sf::Color::Yellow);
@@ -142,14 +142,14 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager
 
 void Render::drawMenu(sf::RenderWindow &window, Engine &engine, int &selection)
 {
-    const int SPACING = Map::SQUARE_SIZE * 2; // Space between options
-    const int START_X = 100;                  // Starting X position
-    const int START_Y = 100;                  // Y position for all options
+    const int SPACING = SQUARE_SIZE * 2; // Space between options
+    const int START_X = 100;             // Starting X position
+    const int START_Y = 100;             // Y position for all options
 
     for (size_t i = 0; i < engine.menuOptions.size(); i++)
     {
         sf::Text text(engine.menuOptions[i], font);
-        text.setCharacterSize(Map::SQUARE_SIZE);
+        text.setCharacterSize(SQUARE_SIZE);
         text.setPosition(START_X, START_Y + (i * SPACING));
 
         // Highlight the current selection
@@ -166,14 +166,14 @@ void Render::drawMenu(sf::RenderWindow &window, Engine &engine, int &selection)
     }
 }
 
-void Render::drawMap(sf::RenderWindow &window, const Map &map)
+void Render::drawMap(sf::RenderWindow &window, const MapHandler &map)
 {
     drawBackground(window);
-    for (int j = 0; j < Map::MAP_HEIGHT; j++)
+    for (int j = 0; j < MAP_HEIGHT; j++)
     {
-        for (int i = 0; i < Map::MAP_WIDTH; i++)
+        for (int i = 0; i < MAP_WIDTH; i++)
         {
-            drawTile(window, map.currentMap[i][j], i, j);
+            drawTile(window, map.getCurrentTile(i, j), i, j);
         }
     }
 }
