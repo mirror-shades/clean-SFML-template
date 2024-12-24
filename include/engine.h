@@ -22,7 +22,7 @@ class Engine
 public:
     std::vector<std::string> menuOptions;
     gameState getState();
-    void update(MapHandler &map, Player &player, Environment &environment, MonsterManager &monsterManager);
+    void checkGrass(MapHandler &map, Player &player, Environment &environment, MonsterManager &monsterManager);
     void setState(gameState newState, Player &player);
 
 private:

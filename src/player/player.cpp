@@ -26,3 +26,13 @@ Monster &Player::getActiveMonster(size_t index)
 {
     return activeMonsters[index];
 }
+
+void Player::setActiveMonster(size_t index)
+{
+    activeMonster = index;
+}
+
+Monster Player::getActiveMonster() const
+{
+    return activeMonsters[activeMonster];
+}

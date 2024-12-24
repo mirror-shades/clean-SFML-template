@@ -49,10 +49,15 @@ void Render::drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y)
         ((static_cast<int>(tile.color) >> 2) & 0x7) * 32, // Green (bits 2-4)
         (static_cast<int>(tile.color) & 0x3) * 64         // Blue  (bits 0-1)
     );
+    char symbolToDraw = tile.symbol;
+    if (tile.symbol == 'g')
+    {
+        symbolToDraw = '"';
+    }
     background.setFillColor(squareColor);
     background.setPosition(x * SQUARE_SIZE, y * SQUARE_SIZE);
     window.draw(background);
-    this->drawSymbol(window, tile.symbol, x, y);
+    this->drawSymbol(window, symbolToDraw, x, y);
 }
 
 void Render::drawScreen(sf::RenderWindow &window, Engine &engine, MapHandler &map, Player &player, MonsterManager &monsterManager, Environment &environment, int selection)
@@ -77,6 +82,42 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager
 {
     int screenWidth = MAP_WIDTH * SQUARE_SIZE;
     int screenHeight = MAP_HEIGHT * SQUARE_SIZE;
+
+    // Add player monster sprite drawing
+    sf::Texture playerMonsterTexture;
+    sf::Sprite playerMonsterSprite;
+    std::string playerMonsterName = player.getActiveMonster().name;
+    std::string playerMonsterImagePath = "assets/images/" + playerMonsterName + ".png";
+
+    if (playerMonsterTexture.loadFromFile(playerMonsterImagePath))
+    {
+        playerMonsterSprite.setTexture(playerMonsterTexture);
+        // Scale down by 50%
+        playerMonsterSprite.setScale(0.5f, 0.5f);
+        // Position the monster on the center left side
+        playerMonsterSprite.setPosition(
+            screenWidth / 4 - (playerMonsterSprite.getLocalBounds().width * 0.5f) / 2,
+            screenHeight * 1 / 3 - (playerMonsterSprite.getLocalBounds().height * 0.5f) / 2);
+        window.draw(playerMonsterSprite);
+    }
+
+    // Add enemy monster sprite drawing
+    sf::Texture enemyMonsterTexture;
+    sf::Sprite enemyMonsterSprite;
+    std::string enemyMonsterName = environment.enemyMonsters.back().name;
+    std::string enemyMonsterImagePath = "assets/images/" + enemyMonsterName + ".png";
+
+    if (enemyMonsterTexture.loadFromFile(enemyMonsterImagePath))
+    {
+        enemyMonsterSprite.setTexture(enemyMonsterTexture);
+        // Scale down by 50%
+        enemyMonsterSprite.setScale(-0.5f, 0.5f); // Negative x scale to flip horizontally
+        // Position the monster on the center right side
+        enemyMonsterSprite.setPosition(
+            screenWidth * 3 / 4 + (enemyMonsterSprite.getLocalBounds().width * 0.5f) / 2, // Adjusted for flipped sprite
+            screenHeight * 1 / 3 - (enemyMonsterSprite.getLocalBounds().height * 0.5f) / 2);
+        window.draw(enemyMonsterSprite);
+    }
 
     std::string move1 = engine.menuOptions[0];
     std::string move2 = engine.menuOptions[1];

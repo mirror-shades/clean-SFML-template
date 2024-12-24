@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <utility>
 #include "player.h"
 #include "map.h"
 #include "engine.h"
@@ -10,7 +11,7 @@
 class InputManager
 {
 public:
-    bool handleInput(sf::Event event, Player &player, MonsterManager &monsterManager, MapHandler &map, Engine &engine, int &selection);
+    std::pair<bool, bool> handleInput(sf::Event event, Player &player, MonsterManager &monsterManager, MapHandler &map, Engine &engine, int &selection);
     bool movePlayer(sf::Event event, Player &player, MapHandler &map);
     bool moveMenu(sf::Event event, int &selection, std::vector<std::string> options);
     int updateSelection(int options, int change, int &selection);

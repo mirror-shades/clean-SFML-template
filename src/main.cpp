@@ -14,10 +14,10 @@ const std::string MAP_DATA[] = {
     "#                      #",
     "#                      #",
     "#                      #",
-    "#          \"\"\"\"        #",
-    "#          \"\"\"\"        #",
-    "#          \"\"\"\"        #",
-    "#          \"\"\"\"        #",
+    "#          gggg        #",
+    "#          gggg        #",
+    "#          gggg        #",
+    "#          gggg        #",
     "#                      #",
     "#                      #",
     "#                      #",
@@ -36,7 +36,7 @@ void loadMapFromStrings(MapHandler &map, const std::string mapData[])
         for (int x = 0; x < MAP_WIDTH; x++)
         {
             char c = mapData[y][x];
-            bool walkable = (c == ' ' || c == '"');
+            bool walkable = (c == ' ' || c == 'g');
             newMap.tiles[x][y] = Tile(c, Color::BLUE, walkable);
         }
     }
@@ -84,14 +84,18 @@ int main()
 
             if (event.type == sf::Event::KeyPressed)
             {
-                needsUpdate = inputManager.handleInput(event, player, monsterManager, map, engine, render.selection);
+                std::pair<bool, bool> inputResult = inputManager.handleInput(event, player, monsterManager, map, engine, render.selection);
+                needsUpdate = inputResult.first;
+                if (inputResult.second)
+                {
+                    engine.checkGrass(map, player, environment, monsterManager);
+                }
             }
         }
 
         if (needsUpdate)
         {
             window.clear();
-            engine.update(map, player, environment, monsterManager);
             render.drawScreen(window, engine, map, player, monsterManager, environment, render.selection);
             window.display();
             needsUpdate = false;

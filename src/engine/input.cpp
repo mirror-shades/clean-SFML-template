@@ -1,14 +1,17 @@
 #include <iostream>
+#include <utility>
 #include "input.h"
 #include "engine.h"
 
-bool InputManager::handleInput(sf::Event event, Player &player, MonsterManager &monsterManager, MapHandler &map, Engine &engine, int &selection)
+std::pair<bool, bool> InputManager::handleInput(sf::Event event, Player &player, MonsterManager &monsterManager, MapHandler &map, Engine &engine, int &selection)
 {
+    bool playerMoved = false;
     if (event.type == sf::Event::KeyPressed)
     {
         if (engine.getState() == GAME_RUNNING)
         {
-            return movePlayer(event, player, map);
+            playerMoved = movePlayer(event, player, map);
+            return {true, playerMoved};
         }
         if (engine.getState() == GAME_MAIN_MENU)
         {
@@ -18,14 +21,14 @@ bool InputManager::handleInput(sf::Event event, Player &player, MonsterManager &
                 handleMenuSelection(engine.menuOptions[selection], player, monsterManager);
                 engine.setState(GAME_RUNNING, player);
             }
-            return true;
+            return {true, playerMoved};
         }
         if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
         {
-            return handleBattleInput(event, selection, player, engine);
+            return {handleBattleInput(event, selection, player, engine), playerMoved};
         }
     }
-    return false;
+    return {false, playerMoved};
 }
 
 void InputManager::handleMenuSelection(std::string selection, Player &player, MonsterManager &monsterManager)
