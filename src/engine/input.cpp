@@ -2,7 +2,7 @@
 #include "input.h"
 #include "engine.h"
 
-bool InputManager::handleInput(sf::Event event, Player &player, MonsterManager &monsterManager, Map &map, Engine &engine, std::vector<std::string> options, int &selection)
+bool InputManager::handleInput(sf::Event event, Player &player, MonsterManager &monsterManager, Map &map, Engine &engine, int &selection)
 {
     if (event.type == sf::Event::KeyPressed)
     {
@@ -12,17 +12,17 @@ bool InputManager::handleInput(sf::Event event, Player &player, MonsterManager &
         }
         if (engine.getState() == GAME_MAIN_MENU)
         {
-            if (moveMenu(event, selection, options))
+            if (moveMenu(event, selection, engine.menuOptions))
             {
                 // menu selected
-                handleMenuSelection(options[selection], player, monsterManager);
+                handleMenuSelection(engine.menuOptions[selection], player, monsterManager);
                 engine.setState(GAME_RUNNING, player);
             }
             return true;
         }
         if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
         {
-            return handleBattleInput(event, selection, options, player, engine);
+            return handleBattleInput(event, selection, player, engine);
         }
     }
     return false;
@@ -48,7 +48,7 @@ void InputManager::handleMenuSelection(std::string selection, Player &player, Mo
     }
 }
 
-bool InputManager::handleBattleInput(sf::Event event, int &selection, std::vector<std::string> options, Player &player, Engine &engine)
+bool InputManager::handleBattleInput(sf::Event event, int &selection, Player &player, Engine &engine)
 {
     if (event.type == sf::Event::KeyPressed)
     {
@@ -62,8 +62,17 @@ bool InputManager::handleBattleInput(sf::Event event, int &selection, std::vecto
             selection = 3;
         if (event.key.code == sf::Keyboard::Enter or event.key.code == sf::Keyboard::Space)
         {
-            std::cout << options[selection] << std::endl;
-            engine.setState(GAME_RUNNING, player);
+            if (engine.menuOptions[selection] == "Switch")
+            {
+                engine.setState(GAME_RUNNING, player);
+            }
+            else if (engine.menuOptions[selection] == "-")
+            {
+            }
+            else
+            {
+                std::cout << engine.menuOptions[selection] << std::endl;
+            }
         }
         return true;
     }

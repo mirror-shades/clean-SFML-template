@@ -5,8 +5,6 @@
 #include "engine.h"
 #include <iostream>
 
-extern std::vector<std::string> menuOptions;
-
 sf::Font font;
 
 void Render::loadFont()
@@ -57,11 +55,12 @@ void Render::drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y)
     this->drawSymbol(window, tile.symbol, x, y);
 }
 
-void Render::drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Player &player, MonsterManager &monsterManager, Environment &environment, std::vector<std::string> options, int selection)
+void Render::drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Player &player, MonsterManager &monsterManager, Environment &environment, int selection)
 {
+
     if (engine.getState() == GAME_MAIN_MENU)
     {
-        drawMenu(window, options, selection);
+        drawMenu(window, engine, selection);
     }
     if (engine.getState() == GAME_RUNNING)
     {
@@ -70,25 +69,19 @@ void Render::drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Play
     }
     if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
     {
-        drawBattle(window, player, monsterManager, environment, selection);
+        drawBattle(window, player, monsterManager, engine, environment, selection);
     }
 }
 
-void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Environment &environment, int &selection)
+void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Engine &engine, Environment &environment, int &selection)
 {
     int screenWidth = Map::MAP_WIDTH * Map::SQUARE_SIZE;
     int screenHeight = Map::MAP_HEIGHT * Map::SQUARE_SIZE;
 
-    // Debug print to see what's in menuOptions
-    std::cout << "Menu options size: " << menuOptions.size() << std::endl;
-    for (const auto &option : menuOptions)
-    {
-        std::cout << "Option: " << option << std::endl;
-    }
-    std::string move1 = menuOptions[0];
-    std::string move2 = menuOptions[1];
-    std::string move3 = menuOptions[2];
-    std::string switchMonster = menuOptions[3];
+    std::string move1 = engine.menuOptions[0];
+    std::string move2 = engine.menuOptions[1];
+    std::string move3 = engine.menuOptions[2];
+    std::string switchMonster = engine.menuOptions[3];
 
     sf::Text text(move1, font);
     text.setCharacterSize(Map::SQUARE_SIZE);
@@ -147,15 +140,15 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager
     window.draw(text4);
 }
 
-void Render::drawMenu(sf::RenderWindow &window, std::vector<std::string> options, int &selection)
+void Render::drawMenu(sf::RenderWindow &window, Engine &engine, int &selection)
 {
     const int SPACING = Map::SQUARE_SIZE * 2; // Space between options
     const int START_X = 100;                  // Starting X position
     const int START_Y = 100;                  // Y position for all options
 
-    for (size_t i = 0; i < options.size(); i++)
+    for (size_t i = 0; i < engine.menuOptions.size(); i++)
     {
-        sf::Text text(options[i], font);
+        sf::Text text(engine.menuOptions[i], font);
         text.setCharacterSize(Map::SQUARE_SIZE);
         text.setPosition(START_X, START_Y + (i * SPACING));
 

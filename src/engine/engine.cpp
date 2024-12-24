@@ -20,9 +20,8 @@ void Engine::update(Map &map, Player &player, Environment &environment, MonsterM
         // if the player is on grass, they have a 15% chance to encounter a monster
         if ((dis(gen) % 100) < 15)
         {
-            setState(GAME_MONSTER_ENCOUNTERED, player);
-            std::cout << "Monster encountered!" << std::endl;
             environment.enemyMonsters.push_back(monsterManager.createMonster((dis(gen) % 4) + 1));
+            setState(GAME_MONSTER_ENCOUNTERED, player);
         }
     }
 }
