@@ -3,6 +3,7 @@
 #include <vector>
 #include <utility>
 #include "monster.h"
+#include "monsterManager.h"
 
 class Player
 {

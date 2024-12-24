@@ -1,5 +1,6 @@
 #include <random>
 #include <iostream>
+#include "monsterManager.h"
 #include "monster.h"
 
 std::vector<MonsterType> monsterTypes;

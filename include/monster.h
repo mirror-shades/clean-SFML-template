@@ -155,12 +155,3 @@ inline void initializeMonsterTypes()
     monsterTypes[3] = golem;
     monsterTypes[4] = sylph;
 }
-
-class MonsterManager
-{
-public:
-    Monster createMonster(int type);
-    void initializeMonsterTypes();
-    void printMonster(Monster monster);
-    void initializeMoveTypes();
-};

@@ -1,13 +1,14 @@
 #pragma once
 #include "map.h"
 #include "player.h"
+#include "monsterManager.h"
 
 enum gameState
 {
     GAME_OVER,
     GAME_RUNNING,
     GAME_PAUSED,
-    GAME_MENU,
+    GAME_MAIN_MENU,
     GAME_MONSTER_ENCOUNTERED
 };
 
@@ -19,6 +20,11 @@ struct Environment
 class Engine
 {
 public:
-    gameState state;
+    std::vector<std::string> menuOptions;
+    gameState getState();
     void update(Map &map, Player &player, Environment &environment, MonsterManager &monsterManager);
+    void setState(gameState newState, Player &player);
+
+private:
+    gameState state = GAME_MAIN_MENU;
 };

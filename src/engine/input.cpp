@@ -6,19 +6,23 @@ bool InputManager::handleInput(sf::Event event, Player &player, MonsterManager &
 {
     if (event.type == sf::Event::KeyPressed)
     {
-        if (engine.state == GAME_RUNNING)
+        if (engine.getState() == GAME_RUNNING)
         {
             return movePlayer(event, player, map);
         }
-        if (engine.state == GAME_MENU)
+        if (engine.getState() == GAME_MAIN_MENU)
         {
             if (moveMenu(event, selection, options))
             {
                 // menu selected
                 handleMenuSelection(options[selection], player, monsterManager);
-                engine.state = GAME_RUNNING;
+                engine.setState(GAME_RUNNING, player);
             }
             return true;
+        }
+        if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
+        {
+            return handleBattleInput(event, selection, options, player, engine);
         }
     }
     return false;
@@ -42,6 +46,28 @@ void InputManager::handleMenuSelection(std::string selection, Player &player, Mo
     {
         player.addMonster(4, monsterManager);
     }
+}
+
+bool InputManager::handleBattleInput(sf::Event event, int &selection, std::vector<std::string> options, Player &player, Engine &engine)
+{
+    if (event.type == sf::Event::KeyPressed)
+    {
+        if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
+            selection = 0;
+        if (event.key.code == sf::Keyboard::A || event.key.code == sf::Keyboard::Left)
+            selection = 1;
+        if (event.key.code == sf::Keyboard::D || event.key.code == sf::Keyboard::Right)
+            selection = 2;
+        if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
+            selection = 3;
+        if (event.key.code == sf::Keyboard::Enter or event.key.code == sf::Keyboard::Space)
+        {
+            std::cout << options[selection] << std::endl;
+            engine.setState(GAME_RUNNING, player);
+        }
+        return true;
+    }
+    return false;
 }
 
 bool InputManager::moveMenu(sf::Event event, int &selection, std::vector<std::string> options)

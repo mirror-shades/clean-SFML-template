@@ -8,6 +8,7 @@
 #include "player.h"
 #include "input.h"
 #include "monster.h"
+extern std::vector<std::string> menuOptions;
 
 Tile level1[24][16] = {
     {
@@ -453,19 +454,46 @@ int main()
     InputManager inputManager;
     MonsterManager monsterManager;
     Environment environment;
-    std::vector<std::string> options = {"Fire", "Water", "Earth", "Air"};
+
     // Initialize monster types before creating any monsters
     monsterManager.initializeMoveTypes();
     monsterManager.initializeMonsterTypes();
     render.selection = 0;
-    engine.state = GAME_MENU;
     render.loadFont();
 
     memcpy(map.currentMap, level1, sizeof(level1));
     bool needsUpdate = true;
 
     // Initialize player position
-    player.setPosition(5, 5); // Set initial position to a valid walkable tile
+    player.setPosition(5, 5);
+
+    // Set initial options based on game state
+    if (engine.getState() == GAME_MAIN_MENU)
+    {
+        menuOptions = {"Fire", "Water", "Earth", "Air"};
+    }
+    else if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
+    {
+        menuOptions.clear();
+        menuOptions.push_back(player.getActiveMonster(0).moves[0].moveName);
+        if (player.getActiveMonster(0).moves.size() > 1)
+        {
+            menuOptions.push_back(player.getActiveMonster(0).moves[1].moveName);
+        }
+        else
+        {
+            menuOptions.push_back("-");
+        }
+        if (player.getActiveMonster(0).moves.size() > 2)
+        {
+            menuOptions.push_back(player.getActiveMonster(0).moves[2].moveName);
+        }
+        else
+        {
+            menuOptions.push_back("-");
+        }
+        menuOptions.push_back("Switch");
+    }
 
     while (window.isOpen())
     {
@@ -477,11 +505,7 @@ int main()
 
             if (event.type == sf::Event::KeyPressed)
             {
-                if (player.getActiveMonsters().size() > 0)
-                {
-                    monsterManager.printMonster(player.getActiveMonster(0));
-                }
-                needsUpdate = inputManager.handleInput(event, player, monsterManager, map, engine, options, render.selection);
+                needsUpdate = inputManager.handleInput(event, player, monsterManager, map, engine, menuOptions, render.selection);
             }
         }
 
@@ -489,7 +513,7 @@ int main()
         {
             window.clear();
             engine.update(map, player, environment, monsterManager);
-            render.drawScreen(window, engine, map, player, monsterManager, environment, options, render.selection);
+            render.drawScreen(window, engine, map, player, monsterManager, environment, menuOptions, render.selection);
             window.display();
             needsUpdate = false;
         }

@@ -3,6 +3,9 @@
 #include "map.h"
 #include "player.h"
 #include "engine.h"
+#include <iostream>
+
+extern std::vector<std::string> menuOptions;
 
 sf::Font font;
 
@@ -56,34 +59,92 @@ void Render::drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y)
 
 void Render::drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Player &player, MonsterManager &monsterManager, Environment &environment, std::vector<std::string> options, int selection)
 {
-    if (engine.state == GAME_MENU)
+    if (engine.getState() == GAME_MAIN_MENU)
     {
         drawMenu(window, options, selection);
     }
-    if (engine.state == GAME_RUNNING)
+    if (engine.getState() == GAME_RUNNING)
     {
         drawMap(window, map);
         drawPlayer(window, player);
     }
-    if (engine.state == GAME_MONSTER_ENCOUNTERED)
+    if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
     {
-        drawBattle(window, player, monsterManager, environment);
+        drawBattle(window, player, monsterManager, environment, selection);
     }
 }
 
-void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Environment &environment)
+void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Environment &environment, int &selection)
 {
-    // just write the name of the most recent monster in the enviroment to the screen
-    sf::Text text(environment.enemyMonsters.back().name, font);
+    int screenWidth = Map::MAP_WIDTH * Map::SQUARE_SIZE;
+    int screenHeight = Map::MAP_HEIGHT * Map::SQUARE_SIZE;
+
+    // Debug print to see what's in menuOptions
+    std::cout << "Menu options size: " << menuOptions.size() << std::endl;
+    for (const auto &option : menuOptions)
+    {
+        std::cout << "Option: " << option << std::endl;
+    }
+    std::string move1 = menuOptions[0];
+    std::string move2 = menuOptions[1];
+    std::string move3 = menuOptions[2];
+    std::string switchMonster = menuOptions[3];
+
+    sf::Text text(move1, font);
     text.setCharacterSize(Map::SQUARE_SIZE);
-    text.setPosition(100, 100);
+    text.setPosition(screenWidth / 2 - text.getLocalBounds().width / 2,
+                     screenHeight * 3 / 4 - Map::SQUARE_SIZE * 2);
+    if (selection == 0)
+    {
+        text.setFillColor(sf::Color::Yellow);
+    }
+    else
+    {
+        text.setFillColor(sf::Color::White);
+    }
     window.draw(text);
 
-    std::vector<Monster> activeMonsters = player.getActiveMonsters();
-    sf::Text text2(activeMonsters.back().name, font);
+    sf::Text text2(move2, font);
     text2.setCharacterSize(Map::SQUARE_SIZE);
-    text2.setPosition(100, 200);
+    text2.setPosition(screenWidth * 1 / 4 - text2.getLocalBounds().width / 2,
+                      screenHeight * 3 / 4);
+    if (selection == 1)
+    {
+        text2.setFillColor(sf::Color::Yellow);
+    }
+    else
+    {
+        text2.setFillColor(sf::Color::White);
+    }
     window.draw(text2);
+
+    sf::Text text3(move3, font);
+    text3.setCharacterSize(Map::SQUARE_SIZE);
+    text3.setPosition(screenWidth * 3 / 4 - text3.getLocalBounds().width / 2,
+                      screenHeight * 3 / 4);
+    if (selection == 2)
+    {
+        text3.setFillColor(sf::Color::Yellow);
+    }
+    else
+    {
+        text3.setFillColor(sf::Color::White);
+    }
+    window.draw(text3);
+
+    sf::Text text4(switchMonster, font);
+    text4.setCharacterSize(Map::SQUARE_SIZE);
+    text4.setPosition(screenWidth / 2 - text4.getLocalBounds().width / 2,
+                      screenHeight * 3 / 4 + Map::SQUARE_SIZE);
+    if (selection == 3)
+    {
+        text4.setFillColor(sf::Color::Yellow);
+    }
+    else
+    {
+        text4.setFillColor(sf::Color::White);
+    }
+    window.draw(text4);
 }
 
 void Render::drawMenu(sf::RenderWindow &window, std::vector<std::string> options, int &selection)

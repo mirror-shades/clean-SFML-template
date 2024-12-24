@@ -11,10 +11,11 @@ class Render
 {
 public:
     int selection;
+    std::vector<std::string> options;
     void loadFont();
     void drawPlayer(sf::RenderWindow &window, Player &player);
     void drawScreen(sf::RenderWindow &window, Engine &engine, Map &map, Player &player, MonsterManager &monsterManager, Environment &environment, std::vector<std::string> options, int selection);
-    void drawBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Environment &environment);
+    void drawBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Environment &environment, int &selection);
 
 private:
     void drawBackground(sf::RenderWindow &window);
