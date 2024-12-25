@@ -68,7 +68,6 @@ int main()
 
     // Set initial options based on game state
     engine.setState(GAME_MAIN_MENU, player);
-    std::cout << "Menu size: " << engine.menuOptions.size() << std::endl;
     for (int i = 0; i < engine.menuOptions.size(); i++)
     {
         std::string option = engine.menuOptions[i];

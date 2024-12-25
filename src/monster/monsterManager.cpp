@@ -2,9 +2,8 @@
 #include <iostream>
 #include "monsterManager.h"
 #include "monster.h"
-
-std::vector<MonsterType> monsterTypes;
-std::vector<Move> moveTypes;
+#include "moves.h"
+#include "elements.h"
 
 Monster MonsterManager::createMonster(int type)
 {

@@ -3,39 +3,10 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "elements.h"
 
-enum ElementType
-{
-    FIRE,
-    WATER,
-    EARTH,
-    AIR
-};
-
-enum MoveName
-{
-    SPARK,
-    CLOD,
-    DRIP,
-    BREEZE
-};
-
-enum MoveType
-{
-    PHYSICAL,
-    SPECIAL,
-    STATUS
-};
-
-struct Move
-{
-    MoveName name;
-    MoveType type;
-    ElementType element;
-    int power;
-    int accuracy;
-    std::string moveName;
-};
+// Forward declaration
+struct Move;
 
 struct MonsterType
 {
@@ -55,7 +26,6 @@ struct MonsterType
 };
 
 extern std::vector<MonsterType> monsterTypes;
-extern std::vector<Move> moveTypes;
 
 struct Monster
 {
@@ -73,16 +43,6 @@ struct Monster
     int speed;
     std::vector<Move> moves;
 };
-
-inline void initializeMoveTypes()
-{
-    moveTypes.clear();
-    moveTypes.resize(5);
-    moveTypes[1] = {SPARK, SPECIAL, FIRE, 80, 95, "Spark"};
-    moveTypes[2] = {CLOD, PHYSICAL, EARTH, 90, 85, "Clod"};
-    moveTypes[3] = {DRIP, SPECIAL, WATER, 75, 100, "Drip"};
-    moveTypes[4] = {BREEZE, STATUS, AIR, 0, 90, "Breeze"};
-}
 
 // Base monster types with stats divided by 10
 inline void initializeMonsterTypes()

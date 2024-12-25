@@ -4,6 +4,7 @@
 #include <utility>
 #include "monster.h"
 #include "monsterManager.h"
+#include "moves.h"
 
 class Player
 {

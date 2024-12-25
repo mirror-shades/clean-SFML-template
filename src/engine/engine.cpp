@@ -3,6 +3,7 @@
 #include "engine.h"
 #include "map.h"
 #include "player.h"
+#include "monster.h"
 
 std::vector<std::string> menuOptions;
 
