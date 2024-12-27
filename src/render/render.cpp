@@ -71,11 +71,49 @@ void Render::drawScreen(sf::RenderWindow &window, Engine &engine, MapHandler &ma
     {
         drawMap(window, map);
         drawPlayer(window, player);
+        drawOverlay(window, environment, player);
     }
     if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
     {
         drawBattle(window, player, monsterManager, engine, environment, selection);
     }
+    if (engine.getState() == GAME_LEVEL_SELECT)
+    {
+        drawLevelSelect(window, engine, selection);
+    }
+}
+
+void Render::drawLevelSelect(sf::RenderWindow &window, Engine &engine, int &selection)
+{
+    const int SPACING = SQUARE_SIZE * 2; // Space between options
+    const int START_X = 200;             // Starting X position
+    const int START_Y = 200;             // Y position for all options
+    const int SQUARE_OFFSET = 50;        // Offset for the selection square
+
+    // Draw selection square if this option is selected
+    sf::RectangleShape square(sf::Vector2f(SQUARE_SIZE, SQUARE_SIZE));
+    square.setFillColor(sf::Color::White);
+    square.setPosition(START_X - SQUARE_OFFSET, START_Y + (selection * SPACING));
+    window.draw(square);
+}
+
+void Render::drawOverlay(sf::RenderWindow &window, Environment &environment, Player &player)
+{
+    // make a rectangle over the top right 3 squares
+    sf::RectangleShape rectangle(sf::Vector2f(SQUARE_SIZE * 5, SQUARE_SIZE * 1));
+    rectangle.setFillColor(sf::Color(0, 0, 0, 128)); // Black with 50% opacity (alpha=128)
+    rectangle.setPosition(MAP_WIDTH * SQUARE_SIZE - SQUARE_SIZE * 4, 0);
+    window.draw(rectangle);
+    // write a word in the top right corner
+    sf::Text text(environment.getLevelElementString(), font);
+    text.setCharacterSize(SQUARE_SIZE / 2);
+    text.setPosition(MAP_WIDTH * SQUARE_SIZE - SQUARE_SIZE * 3.5, 10);
+    window.draw(text);
+    // write a number in the top right corner
+    sf::Text text2(std::to_string(player.getSteps()), font);
+    text2.setCharacterSize(SQUARE_SIZE / 2);
+    text2.setPosition(MAP_WIDTH * SQUARE_SIZE - SQUARE_SIZE, 10);
+    window.draw(text2);
 }
 
 void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Engine &engine, Environment &environment, int &selection)
@@ -184,8 +222,8 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager
 void Render::drawMenu(sf::RenderWindow &window, Engine &engine, int &selection)
 {
     const int SPACING = SQUARE_SIZE * 2; // Space between options
-    const int START_X = 100;             // Starting X position
-    const int START_Y = 100;             // Y position for all options
+    const int START_X = 200;             // Starting X position
+    const int START_Y = 200;             // Y position for all options
 
     for (size_t i = 0; i < engine.menuOptions.size(); i++)
     {

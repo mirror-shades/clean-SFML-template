@@ -8,6 +8,7 @@
 #include "player.h"
 #include "input.h"
 #include "monster.h"
+#include "environment.h"
 
 const std::string MAP_DATA[] = {
     "########################",

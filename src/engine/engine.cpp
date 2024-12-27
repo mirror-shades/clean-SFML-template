@@ -4,7 +4,7 @@
 #include "map.h"
 #include "player.h"
 #include "monster.h"
-
+#include "elements.h"
 std::vector<std::string> menuOptions;
 
 void Engine::checkGrass(MapHandler &map, Player &player, Environment &environment, MonsterManager &monsterManager)
@@ -62,4 +62,31 @@ void Engine::setState(gameState newState, Player &player)
         menuOptions = moves;
     }
     state = newState;
+}
+
+bool Engine::movePlayer(sf::Event event, Player &player, MapHandler &map)
+{
+    // Store potential new position
+    auto [newX, newY] = player.getPosition();
+
+    if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
+        newY--;
+    if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
+        newY++;
+    if (event.key.code == sf::Keyboard::A || event.key.code == sf::Keyboard::Left)
+        newX--;
+    if (event.key.code == sf::Keyboard::D || event.key.code == sf::Keyboard::Right)
+        newX++;
+
+    // Only update position if the move is valid
+    if (map.isValidMove(newX, newY))
+    {
+        player.setSteps(player.getSteps() - 1);
+        player.setPosition(newX, newY);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }

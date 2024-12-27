@@ -10,7 +10,7 @@ std::pair<bool, bool> InputManager::handleInput(sf::Event event, Player &player,
     {
         if (engine.getState() == GAME_RUNNING)
         {
-            playerMoved = movePlayer(event, player, map);
+            playerMoved = engine.movePlayer(event, player, map);
             return {true, playerMoved};
         }
         if (engine.getState() == GAME_MAIN_MENU)
@@ -19,7 +19,8 @@ std::pair<bool, bool> InputManager::handleInput(sf::Event event, Player &player,
             {
                 // menu selected
                 handleMenuSelection(engine.menuOptions[selection], player, monsterManager);
-                engine.setState(GAME_RUNNING, player);
+                engine.setState(GAME_LEVEL_SELECT, player);
+                selection = 0;
             }
             return {true, playerMoved};
         }
@@ -27,8 +28,31 @@ std::pair<bool, bool> InputManager::handleInput(sf::Event event, Player &player,
         {
             return {handleBattleInput(event, selection, player, engine), playerMoved};
         }
+        if (engine.getState() == GAME_LEVEL_SELECT)
+        {
+            return {handleLevelSelectInput(event, selection), playerMoved};
+        }
     }
     return {false, playerMoved};
+}
+
+bool InputManager::handleLevelSelectInput(sf::Event event, int &selection)
+{
+    std::cout << "Current selection: " << selection << std::endl;
+
+    if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
+    {
+        selection = updateSelection(3, -1, selection);
+        std::cout << "Up pressed, new selection: " << selection << std::endl;
+    }
+    if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
+    {
+        selection = updateSelection(3, 1, selection);
+        std::cout << "Down pressed, new selection: " << selection << std::endl;
+    }
+    if (event.key.code == sf::Keyboard::Enter or event.key.code == sf::Keyboard::Space)
+        return true;
+    return true;
 }
 
 void InputManager::handleMenuSelection(std::string selection, Player &player, MonsterManager &monsterManager)
@@ -99,30 +123,4 @@ int InputManager::updateSelection(int options, int change, int &selection)
     if (newSelection < 0)
         newSelection = options - 1;
     return newSelection;
-}
-
-bool InputManager::movePlayer(sf::Event event, Player &player, MapHandler &map)
-{
-    // Store potential new position
-    auto [newX, newY] = player.getPosition();
-
-    if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
-        newY--;
-    if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
-        newY++;
-    if (event.key.code == sf::Keyboard::A || event.key.code == sf::Keyboard::Left)
-        newX--;
-    if (event.key.code == sf::Keyboard::D || event.key.code == sf::Keyboard::Right)
-        newX++;
-
-    // Only update position if the move is valid
-    if (map.isValidMove(newX, newY))
-    {
-        player.setPosition(newX, newY);
-        return true;
-    }
-    else
-    {
-        return false;
-    }
 }

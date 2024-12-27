@@ -25,7 +25,7 @@ endif()
 find_package(SFML 2.6.1 COMPONENTS system window graphics audio REQUIRED)
 
 # Add executable
-add_executable(${PROJECT_NAME} src/main.cpp src/render/render.cpp src/map/map.cpp src/player/player.cpp src/engine/engine.cpp src/engine/input.cpp src/monster/monsterManager.cpp src/monster/monster.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/render/render.cpp src/map/map.cpp src/player/player.cpp src/engine/engine.cpp src/engine/input.cpp src/monster/monsterManager.cpp src/monster/monster.cpp src/engine/environment.cpp)
 
 # Link SFML libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE 

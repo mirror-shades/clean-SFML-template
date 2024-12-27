@@ -22,6 +22,16 @@ const std::vector<Monster> &Player::getActiveMonsters() const
     return activeMonsters;
 }
 
+int Player::getSteps() const
+{
+    return steps;
+}
+
+void Player::setSteps(int newSteps)
+{
+    steps = newSteps;
+}
+
 Monster &Player::getActiveMonster(size_t index)
 {
     return activeMonsters[index];
