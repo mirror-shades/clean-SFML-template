@@ -16,5 +16,5 @@ public:
     int updateSelection(int options, int change, int &selection);
     void handleMenuSelection(std::string selection, Player &player, MonsterManager &monsterManager);
     bool handleBattleInput(sf::Event event, int &selection, Player &player, Engine &engine);
-    bool handleLevelSelectInput(sf::Event event, int &selection);
+    bool handleLevelSelectInput(sf::Event event, int &selection, Engine &engine, Player &player);
 };

@@ -3,6 +3,7 @@
 #include "map.h"
 #include "player.h"
 #include "engine.h"
+#include "elements.h"
 #include <iostream>
 
 sf::Font font;
@@ -85,6 +86,27 @@ void Render::drawScreen(sf::RenderWindow &window, Engine &engine, MapHandler &ma
 
 void Render::drawLevelSelect(sf::RenderWindow &window, Engine &engine, int &selection)
 {
+    std::map<int, sf::Color> elementToColor = {
+        {ElementType::EARTH, sf::Color(34, 139, 34)},      // Forest Green
+        {ElementType::WATER, sf::Color(0, 105, 148)},      // Deep Ocean Blue
+        {ElementType::FIRE, sf::Color(255, 69, 0)},        // Red-Orange
+        {ElementType::AIR, sf::Color(135, 206, 235)},      // Sky Blue
+        {ElementType::DIVINE, sf::Color(255, 215, 0)},     // Golden
+        {ElementType::DEMONIC, sf::Color(139, 0, 0)},      // Dark Red
+        {ElementType::PSYCHIC, sf::Color(147, 112, 219)},  // Purple
+        {ElementType::ELECTRIC, sf::Color(255, 255, 0)},   // Bright Yellow
+        {ElementType::ELDRITCH, sf::Color(75, 0, 130)},    // Indigo
+        {ElementType::FIGHTING, sf::Color(165, 42, 42)},   // Brown
+        {ElementType::CYBERNETIC, sf::Color(0, 191, 255)}, // Deep Sky Blue
+        {ElementType::DRAGON, sf::Color(148, 0, 211)}};    // Dark Violet
+
+    std::map<ElementType, std::string> elementToName = {
+        {ElementType::PSYCHIC, "PSYCHIC"},
+        {ElementType::DRAGON, "DRAGON"},
+        {ElementType::FIRE, "FIRE"}};
+
+    std::vector<ElementType> levelOptions = {ElementType::PSYCHIC, ElementType::DRAGON, ElementType::FIRE};
+
     const int SPACING = SQUARE_SIZE * 2; // Space between options
     const int START_X = 200;             // Starting X position
     const int START_Y = 200;             // Y position for all options
@@ -95,6 +117,23 @@ void Render::drawLevelSelect(sf::RenderWindow &window, Engine &engine, int &sele
     square.setFillColor(sf::Color::White);
     square.setPosition(START_X - SQUARE_OFFSET, START_Y + (selection * SPACING));
     window.draw(square);
+
+    // 2 squared to the right of the selection square
+    // draw a square of a random color
+    // these should always be visible, so draw 3 of them
+    for (int i = 0; i < 3; i++)
+    {
+        sf::RectangleShape randomSquare(sf::Vector2f(SQUARE_SIZE, SQUARE_SIZE));
+        randomSquare.setFillColor(elementToColor[levelOptions[i]]);
+        randomSquare.setPosition(START_X + SQUARE_SIZE * 2, START_Y + (i * SPACING));
+        window.draw(randomSquare);
+
+        std::string elementName = elementToName[levelOptions[i]];
+        sf::Text text(elementName, font);
+        text.setCharacterSize(SQUARE_SIZE / 2);
+        text.setPosition(START_X + SQUARE_SIZE * 3 + 8, START_Y + (i * SPACING) + 8);
+        window.draw(text);
+    }
 }
 
 void Render::drawOverlay(sf::RenderWindow &window, Environment &environment, Player &player)

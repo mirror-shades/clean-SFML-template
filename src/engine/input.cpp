@@ -30,13 +30,13 @@ std::pair<bool, bool> InputManager::handleInput(sf::Event event, Player &player,
         }
         if (engine.getState() == GAME_LEVEL_SELECT)
         {
-            return {handleLevelSelectInput(event, selection), playerMoved};
+            return {handleLevelSelectInput(event, selection, engine, player), playerMoved};
         }
     }
     return {false, playerMoved};
 }
 
-bool InputManager::handleLevelSelectInput(sf::Event event, int &selection)
+bool InputManager::handleLevelSelectInput(sf::Event event, int &selection, Engine &engine, Player &player)
 {
     std::cout << "Current selection: " << selection << std::endl;
 
@@ -50,8 +50,13 @@ bool InputManager::handleLevelSelectInput(sf::Event event, int &selection)
         selection = updateSelection(3, 1, selection);
         std::cout << "Down pressed, new selection: " << selection << std::endl;
     }
+    // this function will also take level options then construct an environment with the selected element
+    // for now just switch to the default level
     if (event.key.code == sf::Keyboard::Enter or event.key.code == sf::Keyboard::Space)
+    {
+        engine.setState(GAME_RUNNING, player);
         return true;
+    }
     return true;
 }
 
