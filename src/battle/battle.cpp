@@ -121,9 +121,6 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &targets)
             if (onAnimationRequested)
             {
                 onAnimationRequested(AnimationState::ATTACKING, attackerIndex, targetIndex, 0.5f);
-            }
-            if (onAnimationRequested)
-            {
                 onAnimationRequested(AnimationState::DEFENDING, attackerIndex, targetIndex, 0.5f);
             }
 

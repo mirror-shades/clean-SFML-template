@@ -88,6 +88,12 @@ int main()
 
     sf::Clock animationClock;
 
+    // Connect battle animations to render system
+    battle.onAnimationRequested = [&render](AnimationState state, int attacker, int target, float duration)
+    {
+        render.queueAnimation(state, attacker, target, duration);
+    };
+
     while (window.isOpen())
     {
         float deltaTime = animationClock.restart().asSeconds();
