@@ -13,9 +13,9 @@ public:
     std::pair<int, int> getPosition() const;
     void addMonster(int type, MonsterManager &monsterManager);
     std::vector<Monster> &getActiveMonsters();
-    Monster getActiveMonster(size_t index);
+    Monster &getActiveMonster(size_t index);
     void setActiveMonster(size_t index);
-    Monster getActiveMonster();
+    Monster &getActiveMonster();
     int getSteps() const;
     void setSteps(int newSteps);
     void updateActiveMonsters(std::vector<Monster> newMonsters);

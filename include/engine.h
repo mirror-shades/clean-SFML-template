@@ -5,6 +5,7 @@
 #include "player.h"
 #include "monsterManager.h"
 #include "environment.h"
+#include "battle.h"
 
 enum gameState
 {
@@ -23,11 +24,8 @@ public:
     void checkGrass(MapHandler &map, Player &player, Environment &environment, MonsterManager &monsterManager);
     void setState(gameState newState, Player &player);
     bool movePlayer(sf::Event event, Player &player, MapHandler &map);
-    void battleTick(Player &player, Environment &environment);
+    void battleTick(Player &player, Environment &environment, Battle &battle);
     void determineTurnOrder(std::vector<Monster> &monsters);
-    void executeAIMove(Monster &attacker, std::vector<Monster> &targets);
-    void executePlayerMove(Monster &attacker, Monster &target, int moveIndex);
-    int calculateMoveDamage(const Monster &attacker, const Monster &target, const Move &move);
     void checkIfMonsterDies(std::vector<Monster> &playerMonsters, std::vector<Monster> &enemyMonsters, Environment &environment, Player &player);
     void restorePlayerMonsters(std::vector<Monster> &playerMonsters, Player &player);
 

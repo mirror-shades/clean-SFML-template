@@ -14,7 +14,7 @@ std::pair<int, int> Player::getPosition() const
 
 void Player::addMonster(int type, MonsterManager &monsterManager)
 {
-    activeMonsters.push_back(monsterManager.createMonster(type));
+    activeMonsters.push_back(monsterManager.createMonster(type, Faction::PLAYER));
 }
 
 std::vector<Monster> &Player::getActiveMonsters()
@@ -32,7 +32,7 @@ void Player::setSteps(int newSteps)
     steps = newSteps;
 }
 
-Monster Player::getActiveMonster(size_t index)
+Monster &Player::getActiveMonster(size_t index)
 {
     return activeMonsters[index];
 }
@@ -42,7 +42,7 @@ void Player::setActiveMonster(size_t index)
     activeMonster = index;
 }
 
-Monster Player::getActiveMonster()
+Monster &Player::getActiveMonster()
 {
     return activeMonsters[activeMonster];
 }

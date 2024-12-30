@@ -25,6 +25,12 @@ struct MonsterType
 
 extern std::vector<MonsterType> monsterTypes;
 
+enum class Faction
+{
+    PLAYER,
+    ENEMY
+};
+
 struct Monster
 {
     int id;
@@ -45,6 +51,7 @@ struct Monster
     int currentTurnPoints;
     std::vector<Move> moves;
     bool canAct;
+    Faction faction;
 
     bool operator==(const Monster &other) const
     {

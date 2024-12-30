@@ -5,7 +5,7 @@
 #include "moves.h"
 #include "elements.h"
 
-Monster MonsterManager::createMonster(int type)
+Monster MonsterManager::createMonster(int type, Faction faction)
 {
     MonsterType baseType = monsterTypes[type];
     // Create random number generator for values between 0.9 and 1.0
@@ -33,6 +33,7 @@ Monster MonsterManager::createMonster(int type)
     monster.currentMovePoints = 0;
     monster.moves.push_back(moveTypes[baseType.initialMove]);
     monster.uid = totalMonsters;
+    monster.faction = faction;
 
     totalMonsters++;
     return monster;

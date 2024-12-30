@@ -9,6 +9,7 @@
 #include "input.h"
 #include "monster.h"
 #include "environment.h"
+#include "battle.h"
 
 const std::string MAP_DATA[] = {
     "########################",
@@ -51,6 +52,7 @@ int main()
     MapHandler map;
     Engine engine;
     Player player;
+    Battle battle;
     InputManager inputManager;
     MonsterManager monsterManager;
     Environment environment;
@@ -101,7 +103,7 @@ int main()
         {
             if (battleClock.getElapsedTime().asSeconds() >= BATTLE_TICK_INTERVAL)
             {
-                engine.battleTick(player, environment);
+                engine.battleTick(player, environment, battle);
                 needsUpdate = true;
                 battleClock.restart();
             }

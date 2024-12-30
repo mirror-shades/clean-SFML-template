@@ -85,6 +85,6 @@ inline void initializeMoveTypes()
     moveTypes.resize(5);
     moveTypes[1] = {SPARK, SPECIAL, FIRE, 45, 90, "Spark"};
     moveTypes[2] = {CLOD, PHYSICAL, EARTH, 50, 85, "Clod"};
-    moveTypes[3] = {DRIP, SPECIAL, WATER, 35, 100, "Drip"};
-    moveTypes[4] = {BREEZE, STATUS, AIR, 0, 90, "Breeze"};
+    moveTypes[3] = {DRIP, PHYSICAL, WATER, 35, 100, "Drip"};
+    moveTypes[4] = {BREEZE, SPECIAL, AIR, 40, 95, "Breeze"};
 }
