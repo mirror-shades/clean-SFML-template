@@ -29,8 +29,6 @@ std::vector<BattleTurn> Battle::getBattleHistory()
 
 void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, std::vector<Monster> &enemyTeam)
 {
-    std::cout << "\nStarting AI move execution..." << std::endl;
-
     // Combine both teams into a single vector for targeting
     std::vector<Monster> allMonsters;
     allMonsters.insert(allMonsters.end(), playerTeam.begin(), playerTeam.end());
@@ -45,21 +43,6 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
             attackerIndex = i;
             break;
         }
-    }
-
-    std::cout << "Attacker: " << attacker.currentStats.name
-              << " (UID: " << attacker.currentStats.uid
-              << ", Faction: " << (attacker.currentStats.faction == Faction::PLAYER ? "Player" : "Enemy")
-              << ")" << std::endl;
-
-    // Debug print all monsters
-    std::cout << "All monsters in battle:" << std::endl;
-    for (size_t i = 0; i < allMonsters.size(); i++)
-    {
-        std::cout << "Monster[" << i << "]: " << allMonsters[i].currentStats.name
-                  << " (UID: " << allMonsters[i].currentStats.uid
-                  << ", Faction: " << (allMonsters[i].currentStats.faction == Faction::PLAYER ? "Player" : "Enemy")
-                  << ")" << std::endl;
     }
 
     if (attackerIndex == -1)
@@ -85,13 +68,14 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
     // For AI, randomly select one target if it's a single-target move
     if (attacker.currentStats.moves[0].targetType == TargetType::SINGLE_ENEMY)
     {
-        // Find the target that would take the most damage
+        // Optionally find a "best" target (for demonstration, we check type effectiveness)
         Monster *bestTarget = nullptr;
         float bestEffectiveness = 0.0f;
 
         for (auto *possibleTarget : validTargets)
         {
-            float effectiveness = getTypeEffectiveness(attacker.currentStats.moves[0].element, possibleTarget->currentStats.element);
+            float effectiveness = getTypeEffectiveness(attacker.currentStats.moves[0].element,
+                                                       possibleTarget->currentStats.element);
             if (effectiveness > bestEffectiveness)
             {
                 bestEffectiveness = effectiveness;
@@ -99,7 +83,7 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
             }
         }
 
-        // If we found a target, use it. Otherwise, keep random selection
+        // If a best target was found, use it; otherwise pick randomly
         if (bestTarget != nullptr)
         {
             validTargets = {bestTarget};
@@ -114,7 +98,7 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
         }
     }
 
-    // Create turn info
+    // Create a BattleTurn to record in history
     BattleTurn turn;
     turn.attackerId = attacker.currentStats.id;
     turn.targetIds.clear();
@@ -124,7 +108,7 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
     }
     turn.action = attacker.currentStats.moves[0].name;
 
-    // Execute move on all valid targets
+    // Execute the move on all valid targets
     for (auto *target : validTargets)
     {
         // Find target index in combined vector
@@ -141,15 +125,10 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
         if (targetIndex == -1)
             continue;
 
-        // Animation and damage logic using attackerIndex and targetIndex
-        if (onAnimationRequested)
-        {
-            onAnimationRequested(AnimationState::ATTACKING, attackerIndex, targetIndex, 0.5f);
-            onAnimationRequested(AnimationState::DEFENDING, attackerIndex, targetIndex, 0.5f);
-        }
-
+        // ======================
+        // ACCURACY CHECK
+        // ======================
         const Move &move = attacker.currentStats.moves[0];
-
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> accuracy_roll(1, 100);
@@ -157,37 +136,67 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
 
         if (roll > move.accuracy)
         {
-            std::cout << "Move missed! Queueing miss animation..." << std::endl;
+            // ==================
+            // MOVE MISSED
+            // ==================
+            std::cout << "BATTLE EXECUTEAIMOVE: Move missed!" << std::endl;
             if (onAnimationRequested)
             {
-                // For misses, only show the attack animation
+                // 1. Choose attack animation based on faction
                 AnimationState attackAnim = (attacker.currentStats.faction == Faction::PLAYER)
                                                 ? AnimationState::ATTACK_RIGHT
                                                 : AnimationState::ATTACK_LEFT;
+
+                // 2. Attacker does the attack animation (but it misses)
                 onAnimationRequested(attackAnim, attackerIndex, targetIndex, 0.5f);
+
+                // 3. Small delay, then return attacker to idle
+                onAnimationRequested(AnimationState::IDLE, attackerIndex, targetIndex, 0.2f);
             }
         }
         else
         {
-            std::cout << "Move hit! Queueing attack animations..." << std::endl;
+            // ==================
+            // MOVE HIT
+            // ==================
             if (onAnimationRequested)
             {
-                // Choose attack direction based on faction
+                // 1. Choose attack animation based on faction
                 AnimationState attackAnim = (attacker.currentStats.faction == Faction::PLAYER)
                                                 ? AnimationState::ATTACK_RIGHT
                                                 : AnimationState::ATTACK_LEFT;
 
-                // Queue attack animation
-                onAnimationRequested(attackAnim, attackerIndex, targetIndex, 0.5f);
+                // 2. Attacker does the attack animation
+                // If it's an enemy (right side), adjust the index
+                int sourceIndex = attackerIndex;
+                if (attacker.currentStats.faction == Faction::ENEMY)
+                {
+                    sourceIndex = attackerIndex - playerTeam.size();
+                }
 
-                // Queue defend animation (jump)
-                onAnimationRequested(AnimationState::DEFENDING, targetIndex, targetIndex, 0.5f);
+                // If target is an enemy, adjust the target index
+                int defenderIndex = targetIndex;
+                if (target->currentStats.faction == Faction::ENEMY)
+                {
+                    defenderIndex = targetIndex - playerTeam.size();
+                }
+
+                onAnimationRequested(attackAnim, sourceIndex, defenderIndex, 0.3f);
+                onAnimationRequested(AnimationState::DEFENDING, defenderIndex, defenderIndex, 0.3f);
+                onAnimationRequested(AnimationState::IDLE, sourceIndex, defenderIndex, 0.2f);
             }
 
+            // ==================
+            // DAMAGE CALCULATION
+            // ==================
             float typeModifier = getTypeEffectiveness(move.element, target->currentStats.element);
 
-            int attackStat = (move.type == MoveType::SPECIAL) ? attacker.currentStats.specialAttack : attacker.currentStats.attack;
-            int defenseStat = (move.type == MoveType::SPECIAL) ? target->currentStats.specialDefense : target->currentStats.defense;
+            int attackStat = (move.type == MoveType::SPECIAL)
+                                 ? attacker.currentStats.specialAttack
+                                 : attacker.currentStats.attack;
+            int defenseStat = (move.type == MoveType::SPECIAL)
+                                  ? target->currentStats.specialDefense
+                                  : target->currentStats.defense;
 
             float baseDamage = (move.power * (attackStat + 10) / (defenseStat + 20)) / 2.5f;
             float stabBonus = (move.element == attacker.currentStats.element) ? 1.4f : 1.0f;
@@ -201,31 +210,38 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
 
             int critRoll = accuracy_roll(gen);
             bool isCritical = (critRoll <= 10);
-
             if (isCritical)
             {
-                damage *= 1.4;
+                damage = static_cast<int>(damage * 1.4f);
             }
 
             int oldHealth = target->currentStats.health;
             target->currentStats.health = std::max(0, target->currentStats.health - damage);
 
+            // ==================
+            // LOGGING RESULTS
+            // ==================
             std::string attackerFaction = (attacker.currentStats.faction == Faction::PLAYER) ? "Allied" : "Enemy";
             std::string targetFaction = (target->currentStats.faction == Faction::PLAYER) ? "Allied" : "Enemy";
 
             std::stringstream result;
-            result << attackerFaction << " " << attacker.currentStats.name << " used " << move.moveName << " on "
+            result << attackerFaction << " " << attacker.currentStats.name
+                   << " used " << move.moveName << " on "
                    << targetFaction << " " << target->currentStats.name << "! ";
+
             if (isCritical)
                 result << "Critical hit! ";
             if (typeModifier > 1.0f)
                 result << "It's super effective! ";
             if (typeModifier < 1.0f)
                 result << "It's not very effective... ";
-            result << "Deals " << damage << " damage to " << targetFaction << " " << target->currentStats.name;
+
+            result << "Deals " << damage << " damage to " << targetFaction << " "
+                   << target->currentStats.name;
 
             turn.result = result.str();
             addTurn(turn);
+
             std::cout << turn.result << "\n";
             std::cout << oldHealth << " -> " << target->currentStats.health << std::endl;
         }

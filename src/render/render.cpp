@@ -187,24 +187,15 @@ void Render::drawBattle(int &selection, std::vector<std::string> menuOptions)
     int screenWidth = MAP_WIDTH * SQUARE_SIZE;
     int screenHeight = MAP_HEIGHT * SQUARE_SIZE;
 
-    std::vector<sf::Vector2f> leftPositions = {
-        sf::Vector2f(screenWidth * 0.15f, screenHeight * 0.2f),
-        sf::Vector2f(screenWidth * 0.25f, screenHeight * 0.4f),
-        sf::Vector2f(screenWidth * 0.15f, screenHeight * 0.6f)};
-
-    std::vector<sf::Vector2f> rightPositions = {
-        sf::Vector2f(screenWidth * 0.85f, screenHeight * 0.2f),
-        sf::Vector2f(screenWidth * 0.75f, screenHeight * 0.4f),
-        sf::Vector2f(screenWidth * 0.85f, screenHeight * 0.6f)};
-
-    // Modify test animation to be more verbose
-    static bool animationAdded = false;
+    // Initialize positions if they're empty
+    if (leftPositions.empty() || rightPositions.empty())
+    {
+        initializeBattlePositions(screenWidth, screenHeight);
+    }
 
     BattleAnimation *currentAnim = getCurrentAnimation();
     if (currentAnim)
     {
-        std::cout << "Playing animation - State: " << currentAnim->state
-                  << " Time: " << currentAnim->elapsed << "/" << currentAnim->duration << std::endl;
         drawBattleWithAnimation(*currentAnim, leftPositions, rightPositions);
     }
 
@@ -413,24 +404,66 @@ void Render::drawBattleWithAnimation(const BattleAnimation &anim,
                                      std::vector<sf::Vector2f> &leftPositions,
                                      std::vector<sf::Vector2f> &rightPositions)
 {
-    // Apply different visual effects based on animation state
+    const float ATTACK_DISTANCE = 50.0f;
+    const float BOUNCE_HEIGHT = 10.0f;
+
     switch (anim.state)
     {
-    case ATTACKING:
-        // Move the attacking monster forward
+    case ATTACK_RIGHT:
+    {
+        // Attacker is on the left, moves to the right
         if (anim.sourceIndex < leftPositions.size())
         {
-            leftPositions[anim.sourceIndex].x += 50.0f * sin(anim.elapsed * 3.14159f);
+            float t = anim.elapsed / anim.duration;
+            float wave = sin(t * 3.14159f);
+            float offsetX = ATTACK_DISTANCE * wave;
+
+            leftPositions[anim.sourceIndex].x =
+                leftOriginalPositions[anim.sourceIndex].x + offsetX;
         }
         break;
+    }
+
+    case ATTACK_LEFT:
+    {
+        // Attacker is on the right, moves to the left
+        if (anim.sourceIndex < rightPositions.size())
+        {
+            float t = anim.elapsed / anim.duration;
+            float wave = sin(t * 3.14159f);
+            float offsetX = ATTACK_DISTANCE * wave;
+
+            rightPositions[anim.sourceIndex].x =
+                rightOriginalPositions[anim.sourceIndex].x - offsetX;
+        }
+        break;
+    }
 
     case DEFENDING:
-        // Make the defending monster bounce
-        if (anim.targetIndex < rightPositions.size())
+    {
+        float t = anim.elapsed / anim.duration;
+        float wave = sin(t * 3.14159f);
+        float offsetY = BOUNCE_HEIGHT * wave;
+
+        // Check if it's a player monster or an enemy monster
+        if (anim.targetIndex < leftPositions.size())
         {
-            rightPositions[anim.targetIndex].y += 20.0f * sin(anim.elapsed * 6.28318f);
+            // Player monster bounce
+            leftPositions[anim.targetIndex].y =
+                leftOriginalPositions[anim.targetIndex].y + offsetY;
+        }
+        else
+        {
+            // Enemy monster bounce
+            int rightIndex = anim.targetIndex - leftPositions.size();
+            if (rightIndex < rightPositions.size())
+            {
+                rightPositions[rightIndex].y =
+                    rightOriginalPositions[rightIndex].y + offsetY;
+            }
         }
         break;
+    }
 
     default:
         break;
@@ -446,4 +479,25 @@ void Render::setReferences(sf::RenderWindow &w, MapHandler &m, Player &p,
     monsterManager = &mm;
     environment = &env;
     battle = &b;
+}
+
+void Render::initializeBattlePositions(int screenWidth, int screenHeight)
+{
+    leftPositions = {
+        sf::Vector2f(screenWidth * 0.15f, screenHeight * 0.2f),
+        sf::Vector2f(screenWidth * 0.25f, screenHeight * 0.4f),
+        sf::Vector2f(screenWidth * 0.15f, screenHeight * 0.6f)};
+    leftOriginalPositions = leftPositions;
+
+    rightPositions = {
+        sf::Vector2f(screenWidth * 0.85f, screenHeight * 0.2f),
+        sf::Vector2f(screenWidth * 0.75f, screenHeight * 0.4f),
+        sf::Vector2f(screenWidth * 0.85f, screenHeight * 0.6f)};
+    rightOriginalPositions = rightPositions;
+}
+
+void Render::resetBattlePositions()
+{
+    leftPositions.clear();
+    rightPositions.clear();
 }

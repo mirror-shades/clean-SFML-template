@@ -35,10 +35,11 @@ public:
     bool isAnimating();
     void updateAnimation(float deltaTime);
     BattleAnimation *getCurrentAnimation();
-    void loadMonsterTextures(const std::vector<Monster> &playerMonsters, const std::vector<Monster> &enemyMonsters);
     void queueAnimation(AnimationState state, int source, int target, float duration);
     void setReferences(sf::RenderWindow &w, MapHandler &m, Player &p,
                        MonsterManager &mm, Environment &env, Battle &b);
+    void initializeBattlePositions(int screenWidth, int screenHeight);
+    void resetBattlePositions();
 
 private:
     sf::Texture playerMonsterTexture;
@@ -60,4 +61,8 @@ private:
     MonsterManager *monsterManager;
     Environment *environment;
     Battle *battle;
+    std::vector<sf::Vector2f> leftPositions;
+    std::vector<sf::Vector2f> rightPositions;
+    std::vector<sf::Vector2f> leftOriginalPositions;
+    std::vector<sf::Vector2f> rightOriginalPositions;
 };
