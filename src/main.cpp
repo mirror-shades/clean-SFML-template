@@ -74,6 +74,9 @@ int main()
         std::string option = engine.menuOptions[i];
     }
 
+    sf::Clock battleClock;
+    const float BATTLE_TICK_INTERVAL = 0.1f; // 100ms between battle updates
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -90,6 +93,17 @@ int main()
                 {
                     engine.checkGrass(map, player, environment, monsterManager);
                 }
+            }
+        }
+
+        // Add battle logic update
+        if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
+        {
+            if (battleClock.getElapsedTime().asSeconds() >= BATTLE_TICK_INTERVAL)
+            {
+                engine.battleTick(player, environment);
+                needsUpdate = true;
+                battleClock.restart();
             }
         }
 

@@ -20,6 +20,7 @@ Monster MonsterManager::createMonster(int type)
 
     // Multiply base stats by random multiplier and round to integer
     monster.health = static_cast<int>(baseType.baseHealth * dis(gen) * 10);
+    monster.currentHealth = monster.health;
     monster.attack = static_cast<int>(baseType.baseAttack * dis(gen) * 10);
     monster.specialAttack = static_cast<int>(baseType.baseSpecialAttack * dis(gen) * 10);
     monster.defense = static_cast<int>(baseType.baseDefense * dis(gen) * 10);
@@ -28,6 +29,8 @@ Monster MonsterManager::createMonster(int type)
     monster.accuracy = static_cast<int>(baseType.baseAccuracy * dis(gen) * 10);
     monster.evasion = static_cast<int>(baseType.baseEvasion * dis(gen) * 10);
     monster.speed = static_cast<int>(baseType.baseSpeed * dis(gen) * 10);
+    monster.currentTurnPoints = 0;
+    monster.currentMovePoints = 0;
     monster.moves.push_back(moveTypes[baseType.initialMove]);
 
     return monster;

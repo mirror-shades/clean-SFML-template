@@ -78,6 +78,9 @@ void InputManager::handleMenuSelection(std::string selection, Player &player, Mo
     {
         player.addMonster(4, monsterManager);
     }
+    // testing
+    player.addMonster(1, monsterManager);
+    player.addMonster(2, monsterManager);
 }
 
 bool InputManager::handleBattleInput(sf::Event event, int &selection, Player &player, Engine &engine)

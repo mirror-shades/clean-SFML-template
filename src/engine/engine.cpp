@@ -21,7 +21,9 @@ void Engine::checkGrass(MapHandler &map, Player &player, Environment &environmen
         // if the player is on grass, they have a 15% chance to encounter a monster
         if ((dis(gen) % 100) < 15)
         {
-            environment.enemyMonsters.push_back(monsterManager.createMonster((dis(gen) % 4) + 1));
+            environment.addEnemyMonster(monsterManager.createMonster((dis(gen) % 4) + 1));
+            environment.addEnemyMonster(monsterManager.createMonster((dis(gen) % 4) + 1));
+            environment.addEnemyMonster(monsterManager.createMonster((dis(gen) % 4) + 1));
             setState(GAME_MONSTER_ENCOUNTERED, player);
         }
     }
@@ -89,4 +91,58 @@ bool Engine::movePlayer(sf::Event event, Player &player, MapHandler &map)
     {
         return false;
     }
+}
+
+void Engine::battleTick(Player &player, Environment &environment)
+{
+    auto playerMonsters = player.getActiveMonsters();
+    auto enemyMonsters = environment.getEnemyMonsters();
+    // for each monster in the player and enemy party, increase their turn points based on their speed
+    for (Monster &monster : playerMonsters)
+    {
+        monster.currentTurnPoints += monster.speed / 2;
+    }
+    // for each monster in the enemy party, increase their turn points based on their speed
+    for (Monster &monster : enemyMonsters)
+    {
+        monster.currentTurnPoints += monster.speed / 2;
+    }
+    // them increase their move points based on their special attack
+    for (Monster &monster : playerMonsters)
+    {
+        monster.currentMovePoints += monster.specialAttack / 4;
+    }
+    // for each monster in the enemy party, increase their move points based on their special attack
+    for (Monster &monster : enemyMonsters)
+    {
+        monster.currentMovePoints += monster.specialAttack / 4;
+    }
+
+    // if any monster has 100 or more turn points, set their turn points to 0
+    for (Monster &monster : playerMonsters)
+    {
+        if (monster.currentTurnPoints >= 1000)
+        {
+            monster.currentTurnPoints = 0;
+        }
+        if (monster.currentMovePoints >= 1000)
+        {
+            monster.currentMovePoints = 1000;
+        }
+    }
+
+    // if any monster has 100 or more move points, set their move points to 100
+    for (Monster &monster : enemyMonsters)
+    {
+        if (monster.currentTurnPoints >= 1000)
+        {
+            monster.currentTurnPoints = 0;
+        }
+        if (monster.currentMovePoints >= 1000)
+        {
+            monster.currentMovePoints = 1000;
+        }
+    }
+    player.updateActiveMonsters(playerMonsters);
+    environment.updateEnemyMonsters(enemyMonsters);
 }

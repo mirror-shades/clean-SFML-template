@@ -37,3 +37,37 @@ std::string Environment::getLevelElementString()
     auto it = elementNames.find(levelElement);
     return it != elementNames.end() ? it->second : "Unknown";
 }
+
+std::vector<Monster> Environment::getEnemyMonsters()
+{
+    return enemyMonsters;
+}
+
+void Environment::addEnemyMonster(Monster monster)
+{
+    enemyMonsters.push_back(monster);
+}
+
+void Environment::removeEnemyMonster(Monster monster)
+{
+    for (auto it = enemyMonsters.begin(); it != enemyMonsters.end(); ++it)
+    {
+        if (it->id == monster.id &&
+            it->name == monster.name &&
+            it->element == monster.element)
+        {
+            enemyMonsters.erase(it);
+            break;
+        }
+    }
+}
+
+void Environment::clearEnemyMonsters()
+{
+    enemyMonsters.clear();
+}
+
+void Environment::updateEnemyMonsters(std::vector<Monster> newMonsters)
+{
+    enemyMonsters = newMonsters;
+}

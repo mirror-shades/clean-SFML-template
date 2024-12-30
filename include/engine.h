@@ -23,6 +23,7 @@ public:
     void checkGrass(MapHandler &map, Player &player, Environment &environment, MonsterManager &monsterManager);
     void setState(gameState newState, Player &player);
     bool movePlayer(sf::Event event, Player &player, MapHandler &map);
+    void battleTick(Player &player, Environment &environment);
 
 private:
     gameState state = GAME_MAIN_MENU;

@@ -17,7 +17,7 @@ void Player::addMonster(int type, MonsterManager &monsterManager)
     activeMonsters.push_back(monsterManager.createMonster(type));
 }
 
-const std::vector<Monster> &Player::getActiveMonsters() const
+std::vector<Monster> Player::getActiveMonsters()
 {
     return activeMonsters;
 }
@@ -32,7 +32,7 @@ void Player::setSteps(int newSteps)
     steps = newSteps;
 }
 
-Monster &Player::getActiveMonster(size_t index)
+Monster Player::getActiveMonster(size_t index)
 {
     return activeMonsters[index];
 }
@@ -42,7 +42,12 @@ void Player::setActiveMonster(size_t index)
     activeMonster = index;
 }
 
-Monster Player::getActiveMonster() const
+Monster Player::getActiveMonster()
 {
     return activeMonsters[activeMonster];
+}
+
+void Player::updateActiveMonsters(std::vector<Monster> newMonsters)
+{
+    activeMonsters = newMonsters;
 }
