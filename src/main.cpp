@@ -3,7 +3,6 @@
 #include "map.h"
 #include "render.h"
 #include "tile.h"
-#include "colors.h"
 #include "engine.h"
 #include "player.h"
 #include "input.h"
@@ -11,6 +10,7 @@
 #include "environment.h"
 #include "battle.h"
 #include "menu.h"
+#include "types.h"
 
 bool needsUpdate = true;
 
@@ -31,15 +31,6 @@ const std::string MAP_DATA[] = {
     "#                      #",
     "#                      #",
     "########################"};
-
-enum GameState
-{
-    GAME_OVER = 0,
-    GAME_MAIN_MENU = 1,
-    GAME_RUNNING = 2,
-    GAME_LEVEL_SELECT = 3,
-    GAME_MONSTER_ENCOUNTERED = 4
-};
 
 void setState(GameState &state, int newState)
 {
@@ -170,7 +161,7 @@ int main()
             std::vector<std::string> menuOptions = menu.getMenuOptions(state, player);
             window.clear();
             render.drawScreen(state, selection, menuOptions);
-            if (!render.isAnimating())
+            if (!render.isAnimating() && state == GAME_MONSTER_ENCOUNTERED)
                 engine.battleTick(player, environment, battle);
             window.display();
             needsUpdate = false;

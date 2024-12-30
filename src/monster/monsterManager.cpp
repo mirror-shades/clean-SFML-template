@@ -2,8 +2,7 @@
 #include <iostream>
 #include "monsterManager.h"
 #include "monster.h"
-#include "moves.h"
-#include "elements.h"
+#include "types.h"
 
 Monster MonsterManager::createMonster(int type, Faction faction)
 {

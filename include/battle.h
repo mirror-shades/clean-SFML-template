@@ -4,6 +4,7 @@
 #include "player.h"
 #include "monster.h"
 #include "environment.h"
+#include <functional>
 
 struct BattleTurn
 {
@@ -17,6 +18,7 @@ struct BattleTurn
 class Battle
 {
 public:
+    std::function<void(AnimationState, int, int, float)> onAnimationRequested;
     void executePlayerMove(Monster &attacker, Monster &target, int moveIndex);
     void executeAIMove(Monster &attacker, std::vector<Monster> &targets);
     void deinit(Player &player);

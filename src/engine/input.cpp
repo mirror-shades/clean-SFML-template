@@ -5,11 +5,6 @@
 
 bool InputManager::walk(sf::Event event, int state, int &selection, std::vector<std::string> menuOptions)
 {
-    std::cout << "Event: " << event.type
-              << " Key: " << event.key.code
-              << " State: " << state
-              << " Selection: " << selection
-              << " MenuSize: " << menuOptions.size() << std::endl;
     bool playerMoved = false;
     playerMoved = engine->movePlayer(event, *player, *map);
     return playerMoved;

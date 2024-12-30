@@ -2,7 +2,7 @@
 #include "render.h"
 #include "map.h"
 #include "player.h"
-#include "elements.h"
+#include "types.h"
 #include <iostream>
 #include <cmath>
 
@@ -16,19 +16,19 @@ void Render::loadFont()
     }
 }
 
-void Render::drawBackground(sf::RenderWindow &window)
+void Render::drawBackground()
 {
     sf::RectangleShape background(sf::Vector2f(1200, 800));
     background.setFillColor(sf::Color::Black);
-    window.draw(background);
+    window->draw(background);
 }
 
-void Render::drawPlayer(sf::RenderWindow &window, Player &player)
+void Render::drawPlayer()
 {
-    drawSymbol(window, '@', player.getPosition().first, player.getPosition().second);
+    drawSymbol('@', player->getPosition().first, player->getPosition().second);
 }
 
-void Render::drawSymbol(sf::RenderWindow &window, const char symbol, int x, int y)
+void Render::drawSymbol(const char symbol, int x, int y)
 {
     sf::Text text(symbol, font);
     int offset = 0;
@@ -36,10 +36,10 @@ void Render::drawSymbol(sf::RenderWindow &window, const char symbol, int x, int 
         offset = 14; // move grass down a quarter of the square size
     text.setCharacterSize(SQUARE_SIZE);
     text.setPosition(x * SQUARE_SIZE, y * SQUARE_SIZE + offset);
-    window.draw(text);
+    window->draw(text);
 }
 
-void Render::drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y)
+void Render::drawTile(const Tile &tile, int x, int y)
 {
     // Draw background
     sf::RectangleShape background(sf::Vector2f(SQUARE_SIZE, SQUARE_SIZE));
@@ -57,33 +57,33 @@ void Render::drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y)
     }
     background.setFillColor(squareColor);
     background.setPosition(x * SQUARE_SIZE, y * SQUARE_SIZE);
-    window.draw(background);
-    this->drawSymbol(window, symbolToDraw, x, y);
+    window->draw(background);
+    this->drawSymbol(symbolToDraw, x, y);
 }
 
 void Render::drawScreen(int state, int selection, std::vector<std::string> menuOptions)
 {
     if (state == 1)
     {
-        drawMenu(*window, selection, menuOptions);
+        drawMenu(selection, menuOptions);
     }
     if (state == 2)
     {
-        drawMap(*window, *map);
-        drawPlayer(*window, *player);
-        drawOverlay(*window, *environment, *player);
+        drawMap();
+        drawPlayer();
+        drawOverlay();
     }
     if (state == 3)
     {
-        drawLevelSelect(*window, selection, menuOptions);
+        drawLevelSelect(selection, menuOptions);
     }
     if (state == 4)
     {
-        drawBattle(*window, *player, *environment, selection, *battle, menuOptions);
+        drawBattle(selection, menuOptions);
     }
 }
 
-void Render::drawLevelSelect(sf::RenderWindow &window, int &selection, std::vector<std::string> menuOptions)
+void Render::drawLevelSelect(int &selection, std::vector<std::string> menuOptions)
 {
     std::map<int, sf::Color> elementToColor = {
         {ElementType::EARTH, sf::Color(34, 139, 34)},      // Forest Green
@@ -115,7 +115,7 @@ void Render::drawLevelSelect(sf::RenderWindow &window, int &selection, std::vect
     sf::RectangleShape square(sf::Vector2f(SQUARE_SIZE, SQUARE_SIZE));
     square.setFillColor(sf::Color::White);
     square.setPosition(START_X - SQUARE_OFFSET, START_Y + (selection * SPACING));
-    window.draw(square);
+    window->draw(square);
 
     // 2 squared to the right of the selection square
     // draw a square of a random color
@@ -125,33 +125,33 @@ void Render::drawLevelSelect(sf::RenderWindow &window, int &selection, std::vect
         sf::RectangleShape randomSquare(sf::Vector2f(SQUARE_SIZE, SQUARE_SIZE));
         randomSquare.setFillColor(elementToColor[levelOptions[i]]);
         randomSquare.setPosition(START_X + SQUARE_SIZE * 2, START_Y + (i * SPACING));
-        window.draw(randomSquare);
+        window->draw(randomSquare);
 
         std::string elementName = elementToName[levelOptions[i]];
         sf::Text text(elementName, font);
         text.setCharacterSize(SQUARE_SIZE / 2);
         text.setPosition(START_X + SQUARE_SIZE * 3 + 8, START_Y + (i * SPACING) + 8);
-        window.draw(text);
+        window->draw(text);
     }
 }
 
-void Render::drawOverlay(sf::RenderWindow &window, Environment &environment, Player &player)
+void Render::drawOverlay()
 {
     // make a rectangle over the top right 3 squares
     sf::RectangleShape rectangle(sf::Vector2f(SQUARE_SIZE * 5, SQUARE_SIZE * 1));
     rectangle.setFillColor(sf::Color(0, 0, 0, 75)); // Black with 50% opacity (alpha=128)
     rectangle.setPosition(MAP_WIDTH * SQUARE_SIZE - SQUARE_SIZE * 4, 0);
-    window.draw(rectangle);
+    window->draw(rectangle);
     // write a word in the top right corner
-    sf::Text text(environment.getLevelElementString(), font);
+    sf::Text text(environment->getLevelElementString(), font);
     text.setCharacterSize(SQUARE_SIZE / 2);
     text.setPosition(MAP_WIDTH * SQUARE_SIZE - SQUARE_SIZE * 3.5, 10);
-    window.draw(text);
+    window->draw(text);
     // write a number in the top right corner
-    sf::Text text2(std::to_string(player.getSteps()), font);
+    sf::Text text2(std::to_string(player->getSteps()), font);
     text2.setCharacterSize(SQUARE_SIZE / 2);
     text2.setPosition(MAP_WIDTH * SQUARE_SIZE - SQUARE_SIZE, 10);
-    window.draw(text2);
+    window->draw(text2);
 }
 
 bool Render::isAnimating()
@@ -182,7 +182,7 @@ BattleAnimation *Render::getCurrentAnimation()
     return animationQueue.empty() ? nullptr : &animationQueue[0];
 }
 
-void Render::drawBattle(sf::RenderWindow &window, Player &player, Environment &environment, int &selection, Battle &battle, std::vector<std::string> menuOptions)
+void Render::drawBattle(int &selection, std::vector<std::string> menuOptions)
 {
     int screenWidth = MAP_WIDTH * SQUARE_SIZE;
     int screenHeight = MAP_HEIGHT * SQUARE_SIZE;
@@ -197,10 +197,11 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, Environment &e
         sf::Vector2f(screenWidth * 0.75f, screenHeight * 0.4f),
         sf::Vector2f(screenWidth * 0.85f, screenHeight * 0.6f)};
 
-    // Test animation (you can remove this later)
+    // Modify test animation to be more verbose
     static bool animationAdded = false;
     if (!animationAdded && animationQueue.empty())
     {
+        std::cout << "Adding test animations to queue" << std::endl;
         queueAnimation(ATTACKING, 0, 0, 1.0f); // 1 second attack
         queueAnimation(DEFENDING, 0, 0, 1.0f); // 1 second defend
         animationAdded = true;
@@ -209,7 +210,9 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, Environment &e
     BattleAnimation *currentAnim = getCurrentAnimation();
     if (currentAnim)
     {
-        drawBattleWithAnimation(window, *currentAnim, leftPositions, rightPositions);
+        std::cout << "Playing animation - State: " << currentAnim->state
+                  << " Time: " << currentAnim->elapsed << "/" << currentAnim->duration << std::endl;
+        drawBattleWithAnimation(*currentAnim, leftPositions, rightPositions);
     }
 
     // Helper function to draw resource bars
@@ -226,7 +229,7 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, Environment &e
         hpBar.setPosition(x - BAR_WIDTH / 2, y);
         float hpRatio = static_cast<float>(monster.currentStats.health) / monster.baseStats.health;
         hpBar.setScale(hpRatio, 1.0f);
-        window.draw(hpBar);
+        window->draw(hpBar);
 
         // MP Bar (Blue)
         sf::RectangleShape mpBar(sf::Vector2f(BAR_WIDTH, BAR_HEIGHT));
@@ -235,22 +238,22 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, Environment &e
         mpBar.setScale(static_cast<float>(monster.movePoints) /
                            (monster.currentStats.specialAttack * MOVE_THRESHOLD_MULTIPLIER),
                        1.0f);
-        window.draw(mpBar);
+        window->draw(mpBar);
 
         // TP Bar (Yellow)
         sf::RectangleShape tpBar(sf::Vector2f(BAR_WIDTH, BAR_HEIGHT));
         tpBar.setFillColor(sf::Color::Yellow);
         tpBar.setPosition(x - BAR_WIDTH / 2, y + (BAR_HEIGHT + BAR_SPACING) * 2);
         tpBar.setScale(static_cast<float>(monster.turnPoints) / 100, 1.0f);
-        window.draw(tpBar);
+        window->draw(tpBar);
     };
 
     // Draw player monsters
-    for (size_t i = 0; i < player.getActiveMonsters().size() && i < leftPositions.size(); i++)
+    for (size_t i = 0; i < player->getActiveMonsters().size() && i < leftPositions.size(); i++)
     {
         sf::Texture texture;
         sf::Sprite sprite;
-        std::string imagePath = "assets/images/" + player.getActiveMonsters()[i].baseStats.name + ".png";
+        std::string imagePath = "assets/images/" + player->getActiveMonsters()[i].baseStats.name + ".png";
 
         if (texture.loadFromFile(imagePath))
         {
@@ -262,25 +265,25 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, Environment &e
 
             // Set opacity based on monster health
             sf::Color spriteColor = sf::Color::White;
-            if (player.getActiveMonsters()[i].currentStats.health <= 0)
+            if (player->getActiveMonsters()[i].currentStats.health <= 0)
             {
                 spriteColor.a = 75; // 50% opacity for defeated monsters
             }
             sprite.setColor(spriteColor);
-            window.draw(sprite);
+            window->draw(sprite);
 
             // Draw resource bars below the sprite
             float barY = leftPositions[i].y + (sprite.getLocalBounds().height * 0.2f) / 2 + 5;
-            drawResourceBars(leftPositions[i].x, barY, player.getActiveMonsters()[i]);
+            drawResourceBars(leftPositions[i].x, barY, player->getActiveMonsters()[i]);
         }
     }
 
     // Draw enemy monsters
-    for (size_t i = 0; i < environment.getEnemyMonsters().size() && i < rightPositions.size(); i++)
+    for (size_t i = 0; i < environment->getEnemyMonsters().size() && i < rightPositions.size(); i++)
     {
         sf::Texture texture;
         sf::Sprite sprite;
-        std::string imagePath = "assets/images/" + environment.getEnemyMonsters()[i].baseStats.name + ".png";
+        std::string imagePath = "assets/images/" + environment->getEnemyMonsters()[i].baseStats.name + ".png";
 
         if (texture.loadFromFile(imagePath))
         {
@@ -292,26 +295,26 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, Environment &e
 
             // Set opacity based on monster health
             sf::Color spriteColor = sf::Color::White;
-            if (environment.getEnemyMonsters()[i].currentStats.health <= 0)
+            if (environment->getEnemyMonsters()[i].currentStats.health <= 0)
             {
                 spriteColor.a = 75; // 50% opacity for defeated monsters
             }
             sprite.setColor(spriteColor);
-            window.draw(sprite);
+            window->draw(sprite);
 
             // Draw resource bars below the sprite
             float barY = rightPositions[i].y + (sprite.getLocalBounds().height * 0.2f) / 2 + 5;
-            drawResourceBars(rightPositions[i].x, barY, environment.getEnemyMonsters()[i]);
+            drawResourceBars(rightPositions[i].x, barY, environment->getEnemyMonsters()[i]);
         }
     }
 
     if (true) // change this to a method to see if it's your monster's turn
     {
-        drawAttackMenu(window, selection, screenWidth, screenHeight, menuOptions);
+        drawAttackMenu(selection, screenWidth, screenHeight, menuOptions);
     }
 }
 
-void Render::drawAttackMenu(sf::RenderWindow &window, int &selection, int screenWidth, int screenHeight, std::vector<std::string> menuOptions)
+void Render::drawAttackMenu(int &selection, int screenWidth, int screenHeight, std::vector<std::string> menuOptions)
 {
     std::string move1 = menuOptions[0];
     std::string move2 = menuOptions[1];
@@ -330,7 +333,7 @@ void Render::drawAttackMenu(sf::RenderWindow &window, int &selection, int screen
     {
         text.setFillColor(sf::Color::White);
     }
-    window.draw(text);
+    window->draw(text);
 
     sf::Text text2(move2, font);
     text2.setCharacterSize(SQUARE_SIZE);
@@ -344,7 +347,7 @@ void Render::drawAttackMenu(sf::RenderWindow &window, int &selection, int screen
     {
         text2.setFillColor(sf::Color::White);
     }
-    window.draw(text2);
+    window->draw(text2);
 
     sf::Text text3(move3, font);
     text3.setCharacterSize(SQUARE_SIZE);
@@ -358,7 +361,7 @@ void Render::drawAttackMenu(sf::RenderWindow &window, int &selection, int screen
     {
         text3.setFillColor(sf::Color::White);
     }
-    window.draw(text3);
+    window->draw(text3);
 
     sf::Text text4(switchMonster, font);
     text4.setCharacterSize(SQUARE_SIZE);
@@ -372,10 +375,10 @@ void Render::drawAttackMenu(sf::RenderWindow &window, int &selection, int screen
     {
         text4.setFillColor(sf::Color::White);
     }
-    window.draw(text4);
+    window->draw(text4);
 }
 
-void Render::drawMenu(sf::RenderWindow &window, int &selection, std::vector<std::string> menuOptions)
+void Render::drawMenu(int &selection, std::vector<std::string> menuOptions)
 {
     const int SPACING = SQUARE_SIZE * 2; // Space between options
     const int START_X = 200;             // Starting X position
@@ -397,23 +400,23 @@ void Render::drawMenu(sf::RenderWindow &window, int &selection, std::vector<std:
             text.setFillColor(sf::Color::White);
         }
 
-        window.draw(text);
+        window->draw(text);
     }
 }
 
-void Render::drawMap(sf::RenderWindow &window, const MapHandler &map)
+void Render::drawMap()
 {
-    drawBackground(window);
+    drawBackground();
     for (int j = 0; j < MAP_HEIGHT; j++)
     {
         for (int i = 0; i < MAP_WIDTH; i++)
         {
-            drawTile(window, map.getCurrentTile(i, j), i, j);
+            drawTile(map->getCurrentTile(i, j), i, j);
         }
     }
 }
 
-void Render::drawBattleWithAnimation(sf::RenderWindow &window, const BattleAnimation &anim,
+void Render::drawBattleWithAnimation(const BattleAnimation &anim,
                                      std::vector<sf::Vector2f> &leftPositions,
                                      std::vector<sf::Vector2f> &rightPositions)
 {

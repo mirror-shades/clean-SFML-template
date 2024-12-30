@@ -4,6 +4,8 @@
 #include <thread>
 #include <sstream>
 #include <iostream>
+#include "types.h"
+#include "render.h"
 
 void Battle::addTurn(BattleTurn turn)
 {
@@ -97,14 +99,34 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &targets)
         std::uniform_int_distribution<> accuracy_roll(1, 100);
         int roll = accuracy_roll(gen);
 
+        // Find the index of the attacker and target in their respective teams
+        int attackerIndex = 0; // You'll need to track this
+        int targetIndex = 0;   // You'll need to track this
+
         if (roll > move.accuracy)
         {
+            // Queue a "miss" animation
+            if (onAnimationRequested)
+            {
+                onAnimationRequested(AnimationState::ATTACKING, attackerIndex, targetIndex, 0.5f);
+            }
+
             std::string result = attacker.currentStats.name + "'s " + move.moveName + " missed!";
             turn.result = result;
             addTurn(turn);
         }
         else
         {
+            // Queue attack animation sequence
+            if (onAnimationRequested)
+            {
+                onAnimationRequested(AnimationState::ATTACKING, attackerIndex, targetIndex, 0.5f);
+            }
+            if (onAnimationRequested)
+            {
+                onAnimationRequested(AnimationState::DEFENDING, attackerIndex, targetIndex, 0.5f);
+            }
+
             float typeModifier = getTypeEffectiveness(move.element, target->currentStats.element);
 
             int attackStat = (move.type == MoveType::SPECIAL) ? attacker.currentStats.specialAttack : attacker.currentStats.attack;

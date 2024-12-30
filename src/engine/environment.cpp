@@ -1,6 +1,6 @@
 #include "environment.h"
 #include <random>
-#include "elements.h"
+#include "types.h"
 
 void Environment::determineLevelElement(ElementType levelElement)
 {

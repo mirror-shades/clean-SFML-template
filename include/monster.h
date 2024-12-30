@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "elements.h"
+#include "types.h"
 #include "moves.h"
 
 struct MonsterType
@@ -23,12 +23,6 @@ struct MonsterType
 };
 
 extern std::vector<MonsterType> monsterTypes;
-
-enum class Faction
-{
-    PLAYER,
-    ENEMY
-};
 
 struct BaseMonster
 {

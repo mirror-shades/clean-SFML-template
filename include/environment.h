@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include "monster.h"
-#include "elements.h"
+#include "types.h"
 
 struct Environment
 {

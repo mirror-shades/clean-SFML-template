@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <string>
 #include "tile.h"
 #include "map.h"
 #include "player.h"
@@ -11,13 +12,6 @@
 
 class Engine;
 
-enum AnimationState
-{
-    IDLE,
-    ATTACKING,
-    EFFECT,
-    DEFENDING
-};
 struct BattleAnimation
 {
     AnimationState state;
@@ -33,14 +27,15 @@ public:
     int selection;
     std::vector<std::string> options;
     void loadFont();
-    void drawPlayer(sf::RenderWindow &window, Player &player);
+    void drawPlayer();
     void drawScreen(int state, int selection, std::vector<std::string> menuOptions);
-    void drawBattle(sf::RenderWindow &window, Player &player, Environment &environment, int &selection, Battle &battle, std::vector<std::string> menuOptions);
-    void drawLevelSelect(sf::RenderWindow &window, int &selection, std::vector<std::string> menuOptions);
-    void drawAttackMenu(sf::RenderWindow &window, int &selection, int screenWidth, int screenHeight, std::vector<std::string> menuOptions);
+    void drawBattle(int &selection, std::vector<std::string> menuOptions);
+    void drawLevelSelect(int &selection, std::vector<std::string> menuOptions);
+    void drawAttackMenu(int &selection, int screenWidth, int screenHeight, std::vector<std::string> menuOptions);
     bool isAnimating();
     void updateAnimation(float deltaTime);
     BattleAnimation *getCurrentAnimation();
+    void loadMonsterTextures(const std::vector<Monster> &playerMonsters, const std::vector<Monster> &enemyMonsters);
     void queueAnimation(AnimationState state, int source, int target, float duration);
     void setReferences(sf::RenderWindow &w, MapHandler &m, Player &p,
                        MonsterManager &mm, Environment &env, Battle &b);
@@ -48,14 +43,14 @@ public:
 private:
     sf::Texture playerMonsterTexture;
     sf::Texture enemyMonsterTexture;
-    void drawBackground(sf::RenderWindow &window);
-    void drawMap(sf::RenderWindow &window, const MapHandler &map);
-    void drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y);
-    void drawSymbol(sf::RenderWindow &window, char symbol, int x, int y);
-    void drawMenu(sf::RenderWindow &window, int &selection, std::vector<std::string> menuOptions);
-    void drawOverlay(sf::RenderWindow &window, Environment &environment, Player &player);
+    void drawBackground();
+    void drawMap();
+    void drawTile(const Tile &tile, int x, int y);
+    void drawSymbol(char symbol, int x, int y);
+    void drawMenu(int &selection, std::vector<std::string> menuOptions);
+    void drawOverlay();
     std::vector<BattleAnimation> animationQueue;
-    void drawBattleWithAnimation(sf::RenderWindow &window, const BattleAnimation &anim,
+    void drawBattleWithAnimation(const BattleAnimation &anim,
                                  std::vector<sf::Vector2f> &leftPositions,
                                  std::vector<sf::Vector2f> &rightPositions);
     // references
