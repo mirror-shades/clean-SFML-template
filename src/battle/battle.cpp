@@ -27,30 +27,63 @@ std::vector<BattleTurn> Battle::getBattleHistory()
     return battleHistory;
 }
 
-void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &targets)
+void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, std::vector<Monster> &enemyTeam)
 {
-    if (attacker.currentStats.health <= 0)
-        return;
+    std::cout << "\nStarting AI move execution..." << std::endl;
 
-    const Move &move = attacker.currentStats.moves[0]; // Still need to implement move selection
-    std::vector<Monster *> validTargets;
+    // Combine both teams into a single vector for targeting
+    std::vector<Monster> allMonsters;
+    allMonsters.insert(allMonsters.end(), playerTeam.begin(), playerTeam.end());
+    allMonsters.insert(allMonsters.end(), enemyTeam.begin(), enemyTeam.end());
 
-    // Get valid targets based on move's targeting type
-    for (size_t i = 0; i < targets.size(); i++)
+    // Find attacker index in combined vector
+    int attackerIndex = -1;
+    for (size_t i = 0; i < allMonsters.size(); i++)
     {
-        Monster &target = targets[i]; // Get direct reference to vector element
-        if (target.currentStats.health > 0 && target.currentStats.faction != attacker.currentStats.faction)
+        if (allMonsters[i].currentStats.uid == attacker.currentStats.uid)
         {
-            validTargets.push_back(&targets[i]); // Store pointer to actual vector element
+            attackerIndex = i;
+            break;
         }
     }
 
-    // If no valid targets, end turn
+    std::cout << "Attacker: " << attacker.currentStats.name
+              << " (UID: " << attacker.currentStats.uid
+              << ", Faction: " << (attacker.currentStats.faction == Faction::PLAYER ? "Player" : "Enemy")
+              << ")" << std::endl;
+
+    // Debug print all monsters
+    std::cout << "All monsters in battle:" << std::endl;
+    for (size_t i = 0; i < allMonsters.size(); i++)
+    {
+        std::cout << "Monster[" << i << "]: " << allMonsters[i].currentStats.name
+                  << " (UID: " << allMonsters[i].currentStats.uid
+                  << ", Faction: " << (allMonsters[i].currentStats.faction == Faction::PLAYER ? "Player" : "Enemy")
+                  << ")" << std::endl;
+    }
+
+    if (attackerIndex == -1)
+    {
+        std::cout << "Error: Attacker not found in combined team vector!" << std::endl;
+        return;
+    }
+
+    // Get valid targets based on move's targeting type
+    std::vector<Monster *> validTargets;
+    for (size_t i = 0; i < allMonsters.size(); i++)
+    {
+        Monster &target = allMonsters[i];
+        if (target.currentStats.health > 0 && target.currentStats.faction != attacker.currentStats.faction)
+        {
+            validTargets.push_back(&allMonsters[i]);
+        }
+    }
+
     if (validTargets.empty())
         return;
 
     // For AI, randomly select one target if it's a single-target move
-    if (move.targetType == TargetType::SINGLE_ENEMY)
+    if (attacker.currentStats.moves[0].targetType == TargetType::SINGLE_ENEMY)
     {
         // Find the target that would take the most damage
         Monster *bestTarget = nullptr;
@@ -58,7 +91,7 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &targets)
 
         for (auto *possibleTarget : validTargets)
         {
-            float effectiveness = getTypeEffectiveness(move.element, possibleTarget->currentStats.element);
+            float effectiveness = getTypeEffectiveness(attacker.currentStats.moves[0].element, possibleTarget->currentStats.element);
             if (effectiveness > bestEffectiveness)
             {
                 bestEffectiveness = effectiveness;
@@ -89,39 +122,66 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &targets)
     {
         turn.targetIds.push_back(target->currentStats.id);
     }
-    turn.action = move.name;
+    turn.action = attacker.currentStats.moves[0].name;
 
     // Execute move on all valid targets
     for (auto *target : validTargets)
     {
+        // Find target index in combined vector
+        int targetIndex = -1;
+        for (size_t i = 0; i < allMonsters.size(); i++)
+        {
+            if (allMonsters[i].currentStats.uid == target->currentStats.uid)
+            {
+                targetIndex = i;
+                break;
+            }
+        }
+
+        if (targetIndex == -1)
+            continue;
+
+        // Animation and damage logic using attackerIndex and targetIndex
+        if (onAnimationRequested)
+        {
+            onAnimationRequested(AnimationState::ATTACKING, attackerIndex, targetIndex, 0.5f);
+            onAnimationRequested(AnimationState::DEFENDING, attackerIndex, targetIndex, 0.5f);
+        }
+
+        const Move &move = attacker.currentStats.moves[0];
+
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> accuracy_roll(1, 100);
         int roll = accuracy_roll(gen);
 
-        // Find the index of the attacker and target in their respective teams
-        int attackerIndex = 0; // You'll need to track this
-        int targetIndex = 0;   // You'll need to track this
-
         if (roll > move.accuracy)
         {
-            // Queue a "miss" animation
+            std::cout << "Move missed! Queueing miss animation..." << std::endl;
             if (onAnimationRequested)
             {
-                onAnimationRequested(AnimationState::ATTACKING, attackerIndex, targetIndex, 0.5f);
+                // For misses, only show the attack animation
+                AnimationState attackAnim = (attacker.currentStats.faction == Faction::PLAYER)
+                                                ? AnimationState::ATTACK_RIGHT
+                                                : AnimationState::ATTACK_LEFT;
+                onAnimationRequested(attackAnim, attackerIndex, targetIndex, 0.5f);
             }
-
-            std::string result = attacker.currentStats.name + "'s " + move.moveName + " missed!";
-            turn.result = result;
-            addTurn(turn);
         }
         else
         {
-            // Queue attack animation sequence
+            std::cout << "Move hit! Queueing attack animations..." << std::endl;
             if (onAnimationRequested)
             {
-                onAnimationRequested(AnimationState::ATTACKING, attackerIndex, targetIndex, 0.5f);
-                onAnimationRequested(AnimationState::DEFENDING, attackerIndex, targetIndex, 0.5f);
+                // Choose attack direction based on faction
+                AnimationState attackAnim = (attacker.currentStats.faction == Faction::PLAYER)
+                                                ? AnimationState::ATTACK_RIGHT
+                                                : AnimationState::ATTACK_LEFT;
+
+                // Queue attack animation
+                onAnimationRequested(attackAnim, attackerIndex, targetIndex, 0.5f);
+
+                // Queue defend animation (jump)
+                onAnimationRequested(AnimationState::DEFENDING, targetIndex, targetIndex, 0.5f);
             }
 
             float typeModifier = getTypeEffectiveness(move.element, target->currentStats.element);

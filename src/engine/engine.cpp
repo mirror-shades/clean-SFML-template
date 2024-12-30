@@ -113,11 +113,11 @@ void Engine::battleTick(Player &player, Environment &environment, Battle &battle
 
         if (isPlayerMonster)
         {
-            battle.executeAIMove(*monster, environment.getEnemyMonsters());
+            battle.executeAIMove(*monster, player.getActiveMonsters(), environment.getEnemyMonsters());
         }
         else
         {
-            battle.executeAIMove(*monster, player.getActiveMonsters());
+            battle.executeAIMove(*monster, player.getActiveMonsters(), environment.getEnemyMonsters());
         }
     }
 

@@ -199,13 +199,6 @@ void Render::drawBattle(int &selection, std::vector<std::string> menuOptions)
 
     // Modify test animation to be more verbose
     static bool animationAdded = false;
-    if (!animationAdded && animationQueue.empty())
-    {
-        std::cout << "Adding test animations to queue" << std::endl;
-        queueAnimation(ATTACKING, 0, 0, 1.0f); // 1 second attack
-        queueAnimation(DEFENDING, 0, 0, 1.0f); // 1 second defend
-        animationAdded = true;
-    }
 
     BattleAnimation *currentAnim = getCurrentAnimation();
     if (currentAnim)

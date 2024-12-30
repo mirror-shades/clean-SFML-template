@@ -26,7 +26,10 @@ typedef enum AnimationState
     IDLE,
     ATTACKING,
     EFFECT,
-    DEFENDING
+    DEFENDING,
+    ATTACK_RIGHT,
+    ATTACK_LEFT,
+    JUMP
 } AnimationState;
 
 typedef enum MoveName

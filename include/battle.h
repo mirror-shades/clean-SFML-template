@@ -20,7 +20,7 @@ class Battle
 public:
     std::function<void(AnimationState, int, int, float)> onAnimationRequested;
     void executePlayerMove(Monster &attacker, Monster &target, int moveIndex);
-    void executeAIMove(Monster &attacker, std::vector<Monster> &targets);
+    void executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, std::vector<Monster> &enemyTeam);
     void deinit(Player &player);
 
 private:
