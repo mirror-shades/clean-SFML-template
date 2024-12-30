@@ -100,6 +100,8 @@ bool InputManager::handleBattleInput(sf::Event event, int &selection, Player &pl
             if (engine.menuOptions[selection] == "Switch")
             {
                 engine.setState(GAME_RUNNING, player);
+                std::vector<Monster> playerMonsters = player.getActiveMonsters();
+                engine.restorePlayerMonsters(playerMonsters, player);
             }
             else if (engine.menuOptions[selection] == "-")
             {

@@ -28,7 +28,8 @@ public:
     void executeAIMove(Monster &attacker, std::vector<Monster> &targets);
     void executePlayerMove(Monster &attacker, Monster &target, int moveIndex);
     int calculateMoveDamage(const Monster &attacker, const Monster &target, const Move &move);
-    void checkIfMonsterDies(std::vector<Monster> &playerMonsters, std::vector<Monster> &enemyMonsters);
+    void checkIfMonsterDies(std::vector<Monster> &playerMonsters, std::vector<Monster> &enemyMonsters, Environment &environment, Player &player);
+    void restorePlayerMonsters(std::vector<Monster> &playerMonsters, Player &player);
 
 private:
     gameState state = GAME_MAIN_MENU;

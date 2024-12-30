@@ -38,7 +38,7 @@ std::string Environment::getLevelElementString()
     return it != elementNames.end() ? it->second : "Unknown";
 }
 
-std::vector<Monster> Environment::getEnemyMonsters()
+std::vector<Monster> &Environment::getEnemyMonsters()
 {
     return enemyMonsters;
 }

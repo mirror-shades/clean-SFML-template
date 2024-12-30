@@ -17,7 +17,7 @@ void Player::addMonster(int type, MonsterManager &monsterManager)
     activeMonsters.push_back(monsterManager.createMonster(type));
 }
 
-std::vector<Monster> Player::getActiveMonsters()
+std::vector<Monster> &Player::getActiveMonsters()
 {
     return activeMonsters;
 }

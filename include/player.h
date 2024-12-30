@@ -12,7 +12,7 @@ public:
     void setPosition(int newX, int newY);
     std::pair<int, int> getPosition() const;
     void addMonster(int type, MonsterManager &monsterManager);
-    std::vector<Monster> getActiveMonsters();
+    std::vector<Monster> &getActiveMonsters();
     Monster getActiveMonster(size_t index);
     void setActiveMonster(size_t index);
     Monster getActiveMonster();
