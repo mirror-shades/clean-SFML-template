@@ -95,54 +95,147 @@ bool Engine::movePlayer(sf::Event event, Player &player, MapHandler &map)
 
 void Engine::battleTick(Player &player, Environment &environment)
 {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+
     auto playerMonsters = player.getActiveMonsters();
     auto enemyMonsters = environment.getEnemyMonsters();
-    // for each monster in the player and enemy party, increase their turn points based on their speed
-    for (Monster &monster : playerMonsters)
+    std::vector<Monster *> allMonsters;
+    std::vector<Monster *> readyToAct;
+
+    // Combine all monsters into one list with pointers
+    for (auto &monster : playerMonsters)
     {
-        monster.currentTurnPoints += monster.speed / 2;
+        allMonsters.push_back(&monster);
     }
-    // for each monster in the enemy party, increase their turn points based on their speed
-    for (Monster &monster : enemyMonsters)
+    for (auto &monster : enemyMonsters)
     {
-        monster.currentTurnPoints += monster.speed / 2;
-    }
-    // them increase their move points based on their special attack
-    for (Monster &monster : playerMonsters)
-    {
-        monster.currentMovePoints += monster.specialAttack / 4;
-    }
-    // for each monster in the enemy party, increase their move points based on their special attack
-    for (Monster &monster : enemyMonsters)
-    {
-        monster.currentMovePoints += monster.specialAttack / 4;
+        allMonsters.push_back(&monster);
     }
 
-    // if any monster has 100 or more turn points, set their turn points to 0
-    for (Monster &monster : playerMonsters)
+    // Accumulate turn points for all monsters
+    for (auto *monster : allMonsters)
     {
-        if (monster.currentTurnPoints >= 1000)
+        monster->currentTurnPoints += monster->speed / 2;
+        monster->currentMovePoints += monster->specialAttack / 4;
+        if (monster->currentTurnPoints >= 1000)
         {
-            monster.currentTurnPoints = 0;
+            readyToAct.push_back(monster);
         }
-        if (monster.currentMovePoints >= 1000)
+        if (monster->currentMovePoints >= 1000)
         {
-            monster.currentMovePoints = 1000;
+            monster->currentMovePoints = 1000;
         }
     }
 
-    // if any monster has 100 or more move points, set their move points to 100
-    for (Monster &monster : enemyMonsters)
+    // Sort and process ready monsters
+    if (!readyToAct.empty())
     {
-        if (monster.currentTurnPoints >= 1000)
+        std::sort(readyToAct.begin(), readyToAct.end(),
+                  [](Monster *a, Monster *b)
+                  { return a->speed > b->speed; });
+
+        for (auto *monster : readyToAct)
         {
-            monster.currentTurnPoints = 0;
-        }
-        if (monster.currentMovePoints >= 1000)
-        {
-            monster.currentMovePoints = 1000;
+            monster->currentTurnPoints -= 1000;
+
+            bool isPlayerMonster = std::find_if(playerMonsters.begin(), playerMonsters.end(),
+                                                [monster](const Monster &m)
+                                                { return &m == monster; }) != playerMonsters.end();
+
+            if (isPlayerMonster)
+            {
+                // Player monsters attack enemy monsters
+                if (!enemyMonsters.empty())
+                {
+                    executeAIMove(*monster, enemyMonsters);
+                }
+            }
+            else
+            {
+                // Enemy monsters attack player monsters
+                if (!playerMonsters.empty())
+                {
+                    executeAIMove(*monster, playerMonsters);
+                }
+            }
+            checkIfMonsterDies(playerMonsters, enemyMonsters);
         }
     }
+
+    // Update the collections
     player.updateActiveMonsters(playerMonsters);
     environment.updateEnemyMonsters(enemyMonsters);
+}
+
+void Engine::checkIfMonsterDies(std::vector<Monster> &playerMonsters, std::vector<Monster> &enemyMonsters)
+{
+    for (auto &monster : playerMonsters)
+    {
+        if (monster.currentHealth <= 0)
+        {
+            playerMonsters.erase(std::remove(playerMonsters.begin(), playerMonsters.end(), monster), playerMonsters.end());
+        }
+    }
+    for (auto &monster : enemyMonsters)
+    {
+        if (monster.currentHealth <= 0)
+        {
+            enemyMonsters.erase(std::remove(enemyMonsters.begin(), enemyMonsters.end(), monster), enemyMonsters.end());
+        }
+    }
+}
+
+void Engine::executeAIMove(Monster &attacker, std::vector<Monster> &targets)
+{
+    if (!targets.empty())
+    {
+        Monster &target = targets[0];
+        // Calculate and apply damage
+        int damage = std::max(1, attacker.attack - target.defense);
+        target.currentHealth = std::max(0, target.currentHealth - damage);
+
+        // Debug output to verify damage is being calculated
+        std::cout << "AI Attack: " << attacker.name << " deals " << damage
+                  << " damage to " << target.name
+                  << " (HP: " << target.currentHealth << ")" << std::endl;
+    }
+}
+
+// Add this function to handle player's move selection
+void Engine::executePlayerMove(Monster &attacker, Monster &target, int moveIndex)
+{
+    // Get the selected move
+    if (moveIndex >= 0 && moveIndex < attacker.moves.size())
+    {
+        Move &selectedMove = attacker.moves[moveIndex];
+
+        // Calculate damage based on move power, attacker's stats, and target's defense
+        int damage = calculateMoveDamage(attacker, target, selectedMove);
+        target.currentHealth = std::max(0, target.currentHealth - damage);
+
+        // Reset the monster's action flag
+        attacker.canAct = false;
+    }
+}
+
+int Engine::calculateMoveDamage(const Monster &attacker, const Monster &target, const Move &move)
+{
+    // Basic damage formula
+    float baseDamage = move.power * (float)attacker.attack / target.defense;
+
+    // Add type effectiveness (you'll need to implement this)
+    float typeMultiplier = 1; // getTypeEffectiveness(move.type, target.type);
+
+    // Add random variation (0.85 to 1.15)
+    float random = 0.85f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (0.3f)));
+
+    return std::max(1, static_cast<int>(baseDamage * typeMultiplier * random));
+}
+
+void Engine::determineTurnOrder(std::vector<Monster> &monsters)
+{
+    // sort the monsters by speed
+    std::sort(monsters.begin(), monsters.end(), [](Monster &a, Monster &b)
+              { return a.speed > b.speed; });
 }

@@ -9,4 +9,5 @@ public:
     void initializeMonsterTypes();
     void printMonster(Monster monster);
     void initializeMoveTypes();
+    int totalMonsters;
 };

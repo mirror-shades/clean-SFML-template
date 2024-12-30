@@ -24,6 +24,11 @@ public:
     void setState(gameState newState, Player &player);
     bool movePlayer(sf::Event event, Player &player, MapHandler &map);
     void battleTick(Player &player, Environment &environment);
+    void determineTurnOrder(std::vector<Monster> &monsters);
+    void executeAIMove(Monster &attacker, std::vector<Monster> &targets);
+    void executePlayerMove(Monster &attacker, Monster &target, int moveIndex);
+    int calculateMoveDamage(const Monster &attacker, const Monster &target, const Move &move);
+    void checkIfMonsterDies(std::vector<Monster> &playerMonsters, std::vector<Monster> &enemyMonsters);
 
 private:
     gameState state = GAME_MAIN_MENU;

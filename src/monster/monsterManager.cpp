@@ -32,7 +32,9 @@ Monster MonsterManager::createMonster(int type)
     monster.currentTurnPoints = 0;
     monster.currentMovePoints = 0;
     monster.moves.push_back(moveTypes[baseType.initialMove]);
+    monster.uid = totalMonsters;
 
+    totalMonsters++;
     return monster;
 }
 

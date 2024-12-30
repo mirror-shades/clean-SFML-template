@@ -28,6 +28,7 @@ extern std::vector<MonsterType> monsterTypes;
 struct Monster
 {
     int id;
+    int uid;
     ElementType element;
     std::string name;
     int health;
@@ -43,6 +44,12 @@ struct Monster
     int speed;
     int currentTurnPoints;
     std::vector<Move> moves;
+    bool canAct;
+
+    bool operator==(const Monster &other) const
+    {
+        return uid == other.uid;
+    }
 };
 
 // Base monster types with stats divided by 10
