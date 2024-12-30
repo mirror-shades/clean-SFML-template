@@ -10,6 +10,9 @@
 #include "monster.h"
 #include "environment.h"
 #include "battle.h"
+#include "menu.h"
+
+bool needsUpdate = true;
 
 const std::string MAP_DATA[] = {
     "########################",
@@ -29,7 +32,21 @@ const std::string MAP_DATA[] = {
     "#                      #",
     "########################"};
 
-// Convert string to tiles
+enum GameState
+{
+    GAME_OVER = 0,
+    GAME_MAIN_MENU = 1,
+    GAME_RUNNING = 2,
+    GAME_LEVEL_SELECT = 3,
+    GAME_MONSTER_ENCOUNTERED = 4
+};
+
+void setState(GameState &state, int newState)
+{
+    state = static_cast<GameState>(newState);
+    needsUpdate = true;
+}
+
 void loadMapFromStrings(MapHandler &map, const std::string mapData[])
 {
     Map newMap;
@@ -53,34 +70,37 @@ int main()
     Engine engine;
     Player player;
     Battle battle;
+    GameState state;
     InputManager inputManager;
     MonsterManager monsterManager;
     Environment environment;
+    Menu menu;
 
-    // Initialize monster types before creating any monsters
+    // Initialize game state
+    int selection = 0;
+
+    // Initialize game state
+    setState(state, GAME_MAIN_MENU);
     monsterManager.initializeMoveTypes();
     monsterManager.initializeMonsterTypes();
-    render.selection = 0;
+    inputManager.setReferences(player, monsterManager, map, engine, battle);
+    render.setReferences(window, map, player, monsterManager, environment, battle);
     render.loadFont();
-
     loadMapFromStrings(map, MAP_DATA);
-    bool needsUpdate = true;
 
     // Initialize player position
     player.setPosition(5, 5);
-
-    // Set initial options based on game state
-    engine.setState(GAME_MAIN_MENU, player);
-    for (int i = 0; i < engine.menuOptions.size(); i++)
-    {
-        std::string option = engine.menuOptions[i];
-    }
+    menu.getMenuOptions(state, player);
 
     sf::Clock battleClock;
     const float BATTLE_TICK_INTERVAL = 0.1f; // 100ms between battle updates
 
+    sf::Clock animationClock;
+
     while (window.isOpen())
     {
+        float deltaTime = animationClock.restart().asSeconds();
+
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -89,30 +109,69 @@ int main()
 
             if (event.type == sf::Event::KeyPressed)
             {
-                std::pair<bool, bool> inputResult = inputManager.handleInput(event, player, monsterManager, map, engine, battle, render.selection);
-                needsUpdate = inputResult.first;
-                if (inputResult.second)
+                std::vector<std::string> menuOptions;
+                if (state == GAME_MAIN_MENU)
                 {
-                    engine.checkGrass(map, player, environment, monsterManager, battle);
+                    bool menuResult = menu.handleMenuSelection(event, selection);
+                    needsUpdate = true; // Always update on menu interaction
+                    if (menuResult)     // Only check the result once
+                    {
+                        menuOptions = menu.getMenuOptions(state, player);
+                        std::string picked = menuOptions[selection];
+                        std::cout << "Picked: " << picked << std::endl;
+                        inputManager.handleMainMenuSelection(picked, player, monsterManager);
+                        menu.getMenuOptions(GAME_LEVEL_SELECT, player);
+                        menu.setMenuOptions(menuOptions);
+                        selection = 0;
+                        setState(state, GAME_LEVEL_SELECT);
+                    }
+                }
+                else if (state == GAME_LEVEL_SELECT)
+                {
+                    bool menuResult = menu.handleMenuSelection(event, selection);
+                    needsUpdate = true;
+                    if (menuResult)
+                    {
+                        menuOptions = menu.getMenuOptions(GAME_LEVEL_SELECT, player);
+                        std::string picked = menuOptions[selection];
+                        setState(state, GAME_RUNNING);
+                    }
+                }
+                else
+                {
+                    menuOptions = menu.getMenuOptions(GAME_RUNNING, player);
+                    bool inputResult = inputManager.walk(event, state, selection, menuOptions);
+                    needsUpdate = true;
+                    if (inputResult)
+                    {
+                        if (engine.checkGrass(map, player, environment, monsterManager, battle, state))
+                        {
+                            setState(state, GAME_MONSTER_ENCOUNTERED);
+                        }
+                    }
                 }
             }
         }
 
         // Add battle logic update
-        if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
+        if (state == GAME_MONSTER_ENCOUNTERED)
         {
             if (battleClock.getElapsedTime().asSeconds() >= BATTLE_TICK_INTERVAL)
             {
-                engine.battleTick(player, environment, battle);
                 needsUpdate = true;
                 battleClock.restart();
             }
         }
 
-        if (needsUpdate)
+        render.updateAnimation(deltaTime);
+
+        if (needsUpdate || render.getCurrentAnimation())
         {
+            std::vector<std::string> menuOptions = menu.getMenuOptions(state, player);
             window.clear();
-            render.drawScreen(window, engine, map, player, monsterManager, environment, render.selection, battle);
+            render.drawScreen(state, selection, menuOptions);
+            if (!render.isAnimating())
+                engine.battleTick(player, environment, battle);
             window.display();
             needsUpdate = false;
         }

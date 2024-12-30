@@ -3,61 +3,19 @@
 #include "input.h"
 #include "engine.h"
 
-std::pair<bool, bool> InputManager::handleInput(sf::Event event, Player &player, MonsterManager &monsterManager, MapHandler &map, Engine &engine, Battle &battle, int &selection)
+bool InputManager::walk(sf::Event event, int state, int &selection, std::vector<std::string> menuOptions)
 {
+    std::cout << "Event: " << event.type
+              << " Key: " << event.key.code
+              << " State: " << state
+              << " Selection: " << selection
+              << " MenuSize: " << menuOptions.size() << std::endl;
     bool playerMoved = false;
-    if (event.type == sf::Event::KeyPressed)
-    {
-        if (engine.getState() == GAME_RUNNING)
-        {
-            playerMoved = engine.movePlayer(event, player, map);
-            return {true, playerMoved};
-        }
-        if (engine.getState() == GAME_MAIN_MENU)
-        {
-            if (moveMenu(event, selection, engine.menuOptions))
-            {
-                // menu selected
-                handleMenuSelection(engine.menuOptions[selection], player, monsterManager);
-                engine.setState(GAME_LEVEL_SELECT, player);
-                selection = 0;
-            }
-            return {true, playerMoved};
-        }
-        if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
-        {
-            return {handleBattleInput(event, selection, player, engine, battle), playerMoved};
-        }
-        if (engine.getState() == GAME_LEVEL_SELECT)
-        {
-            return {handleLevelSelectInput(event, selection, engine, player), playerMoved};
-        }
-    }
-    return {false, playerMoved};
+    playerMoved = engine->movePlayer(event, *player, *map);
+    return playerMoved;
 }
 
-bool InputManager::handleLevelSelectInput(sf::Event event, int &selection, Engine &engine, Player &player)
-{
-
-    if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
-    {
-        selection = updateSelection(3, -1, selection);
-    }
-    if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
-    {
-        selection = updateSelection(3, 1, selection);
-    }
-    // this function will also take level options then construct an environment with the selected element
-    // for now just switch to the default level
-    if (event.key.code == sf::Keyboard::Enter or event.key.code == sf::Keyboard::Space)
-    {
-        engine.setState(GAME_RUNNING, player);
-        return true;
-    }
-    return true;
-}
-
-void InputManager::handleMenuSelection(std::string selection, Player &player, MonsterManager &monsterManager)
+void InputManager::handleMainMenuSelection(std::string selection, Player &player, MonsterManager &monsterManager)
 {
     if (selection == "Fire")
     {
@@ -78,9 +36,10 @@ void InputManager::handleMenuSelection(std::string selection, Player &player, Mo
     // testing
     player.addMonster(1, monsterManager);
     player.addMonster(2, monsterManager);
+    std::cout << "Selection: " << selection << std::endl;
 }
 
-bool InputManager::handleBattleInput(sf::Event event, int &selection, Player &player, Engine &engine, Battle &battle)
+bool InputManager::handleBattleInput(sf::Event event, int &selection, std::vector<std::string> menuOptions)
 {
     if (event.type == sf::Event::KeyPressed)
     {
@@ -94,18 +53,17 @@ bool InputManager::handleBattleInput(sf::Event event, int &selection, Player &pl
             selection = 3;
         if (event.key.code == sf::Keyboard::Enter or event.key.code == sf::Keyboard::Space)
         {
-            if (engine.menuOptions[selection] == "Switch")
+            if (menuOptions[selection] == "Switch")
             {
-                engine.setState(GAME_RUNNING, player);
-                battle.deinit(player);
-                std::vector<Monster> playerMonsters = player.getActiveMonsters();
+                battle->deinit(*player);
+                std::vector<Monster> playerMonsters = player->getActiveMonsters();
             }
-            else if (engine.menuOptions[selection] == "-")
+            else if (menuOptions[selection] == "-")
             {
             }
             else
             {
-                std::cout << engine.menuOptions[selection] << std::endl;
+                std::cout << menuOptions[selection] << std::endl;
             }
         }
         return true;
@@ -113,21 +71,11 @@ bool InputManager::handleBattleInput(sf::Event event, int &selection, Player &pl
     return false;
 }
 
-bool InputManager::moveMenu(sf::Event event, int &selection, std::vector<std::string> options)
+void InputManager::setReferences(Player &p, MonsterManager &mm, MapHandler &m, Engine &e, Battle &b)
 {
-    if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
-        selection = updateSelection(options.size(), -1, selection);
-    if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
-        selection = updateSelection(options.size(), 1, selection);
-    if (event.key.code == sf::Keyboard::Enter or event.key.code == sf::Keyboard::Space)
-        return true;
-    return false;
-}
-
-int InputManager::updateSelection(int options, int change, int &selection)
-{
-    int newSelection = (selection + change) % options;
-    if (newSelection < 0)
-        newSelection = options - 1;
-    return newSelection;
+    player = &p;
+    monsterManager = &mm;
+    map = &m;
+    engine = &e;
+    battle = &b;
 }

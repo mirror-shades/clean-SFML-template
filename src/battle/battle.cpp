@@ -151,8 +151,6 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &targets)
             std::cout << oldHealth << " -> " << target->currentStats.health << std::endl;
         }
     }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
 float Battle::getTypeEffectiveness(ElementType moveType, ElementType targetType)

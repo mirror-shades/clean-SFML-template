@@ -7,62 +7,26 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include "render.h"
 
-std::vector<std::string> menuOptions;
-
-void Engine::checkGrass(MapHandler &map, Player &player, Environment &environment, MonsterManager &monsterManager, Battle &battle)
+bool Engine::checkGrass(MapHandler &map, Player &player, Environment &environment, MonsterManager &monsterManager, Battle &battle, int state)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 1000000);
 
-    if (map.getCurrentTile(player.getPosition().first, player.getPosition().second).symbol == 'g' and getState() == GAME_RUNNING)
+    std::cout << "Checking grass at: " << player.getPosition().first << ", " << player.getPosition().second << std::endl;
+    if (map.getCurrentTile(player.getPosition().first, player.getPosition().second).symbol == 'g')
     {
         if ((dis(gen) % 100) < 15) // 15% chance to encounter a monster
         {
             environment.addEnemyMonster(monsterManager.createMonster((dis(gen) % 4) + 1, Faction::ENEMY));
             environment.addEnemyMonster(monsterManager.createMonster((dis(gen) % 4) + 1, Faction::ENEMY));
             environment.addEnemyMonster(monsterManager.createMonster((dis(gen) % 4) + 1, Faction::ENEMY));
-            setState(GAME_MONSTER_ENCOUNTERED, player);
+            return true;
         }
     }
-}
-
-gameState Engine::getState()
-{
-    return state;
-}
-
-void Engine::setState(gameState newState, Player &player)
-{
-    if (newState == GAME_MAIN_MENU)
-    {
-        menuOptions = {"Fire", "Water", "Earth", "Air"};
-    }
-    else if (newState == GAME_MONSTER_ENCOUNTERED)
-    {
-        std::vector<std::string> moves;
-        moves.push_back(player.getActiveMonster(0).currentStats.moves[0].moveName);
-        if (player.getActiveMonster(0).currentStats.moves.size() > 1)
-        {
-            moves.push_back(player.getActiveMonster(0).currentStats.moves[1].moveName);
-        }
-        else
-        {
-            moves.push_back("-");
-        }
-        if (player.getActiveMonster(0).currentStats.moves.size() > 2)
-        {
-            moves.push_back(player.getActiveMonster(0).currentStats.moves[2].moveName);
-        }
-        else
-        {
-            moves.push_back("-");
-        }
-        moves.push_back("Switch");
-        menuOptions = moves;
-    }
-    state = newState;
+    return false;
 }
 
 bool Engine::movePlayer(sf::Event event, Player &player, MapHandler &map)
@@ -91,7 +55,6 @@ bool Engine::movePlayer(sf::Event event, Player &player, MapHandler &map)
         return false;
     }
 }
-
 void Engine::battleTick(Player &player, Environment &environment, Battle &battle)
 {
     static std::random_device rd;
@@ -175,7 +138,6 @@ void Engine::checkIfMonsterDies(std::vector<Monster> &playerBattleMonsters, std:
     {
         // implement win condition here
         environment.clearEnemyMonsters();
-        setState(GAME_RUNNING, player);
     }
     bool allyAlive = false;
     for (auto &monster : playerBattleMonsters)
@@ -189,7 +151,6 @@ void Engine::checkIfMonsterDies(std::vector<Monster> &playerBattleMonsters, std:
     {
         // implement game over here
         environment.clearEnemyMonsters();
-        setState(GAME_RUNNING, player);
     }
 }
 

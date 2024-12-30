@@ -2,9 +2,9 @@
 #include "render.h"
 #include "map.h"
 #include "player.h"
-#include "engine.h"
 #include "elements.h"
 #include <iostream>
+#include <cmath>
 
 sf::Font font;
 
@@ -61,30 +61,29 @@ void Render::drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y)
     this->drawSymbol(window, symbolToDraw, x, y);
 }
 
-void Render::drawScreen(sf::RenderWindow &window, Engine &engine, MapHandler &map, Player &player, MonsterManager &monsterManager, Environment &environment, int selection, Battle &battle)
+void Render::drawScreen(int state, int selection, std::vector<std::string> menuOptions)
 {
-
-    if (engine.getState() == GAME_MAIN_MENU)
+    if (state == 1)
     {
-        drawMenu(window, engine, selection);
+        drawMenu(*window, selection, menuOptions);
     }
-    if (engine.getState() == GAME_RUNNING)
+    if (state == 2)
     {
-        drawMap(window, map);
-        drawPlayer(window, player);
-        drawOverlay(window, environment, player);
+        drawMap(*window, *map);
+        drawPlayer(*window, *player);
+        drawOverlay(*window, *environment, *player);
     }
-    if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
+    if (state == 3)
     {
-        drawBattle(window, player, monsterManager, engine, environment, selection, battle);
+        drawLevelSelect(*window, selection, menuOptions);
     }
-    if (engine.getState() == GAME_LEVEL_SELECT)
+    if (state == 4)
     {
-        drawLevelSelect(window, engine, selection);
+        drawBattle(*window, *player, *environment, selection, *battle, menuOptions);
     }
 }
 
-void Render::drawLevelSelect(sf::RenderWindow &window, Engine &engine, int &selection)
+void Render::drawLevelSelect(sf::RenderWindow &window, int &selection, std::vector<std::string> menuOptions)
 {
     std::map<int, sf::Color> elementToColor = {
         {ElementType::EARTH, sf::Color(34, 139, 34)},      // Forest Green
@@ -155,23 +154,63 @@ void Render::drawOverlay(sf::RenderWindow &window, Environment &environment, Pla
     window.draw(text2);
 }
 
-void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Engine &engine, Environment &environment, int &selection, Battle &battle)
+bool Render::isAnimating()
+{
+    return !animationQueue.empty();
+}
+
+void Render::queueAnimation(AnimationState state, int source, int target, float duration)
+{
+    BattleAnimation anim = {state, source, target, duration, 0.0f};
+    animationQueue.push_back(anim);
+}
+
+void Render::updateAnimation(float deltaTime)
+{
+    if (!animationQueue.empty())
+    {
+        animationQueue[0].elapsed += deltaTime;
+        if (animationQueue[0].elapsed >= animationQueue[0].duration)
+        {
+            animationQueue.erase(animationQueue.begin());
+        }
+    }
+}
+
+BattleAnimation *Render::getCurrentAnimation()
+{
+    return animationQueue.empty() ? nullptr : &animationQueue[0];
+}
+
+void Render::drawBattle(sf::RenderWindow &window, Player &player, Environment &environment, int &selection, Battle &battle, std::vector<std::string> menuOptions)
 {
     int screenWidth = MAP_WIDTH * SQUARE_SIZE;
     int screenHeight = MAP_HEIGHT * SQUARE_SIZE;
 
-    // Define positions for triangle formation
     std::vector<sf::Vector2f> leftPositions = {
-        sf::Vector2f(screenWidth * 0.15f, screenHeight * 0.2f), // Top monster
-        sf::Vector2f(screenWidth * 0.25f, screenHeight * 0.4f), // Middle monster
-        sf::Vector2f(screenWidth * 0.15f, screenHeight * 0.6f)  // Bottom monster
-    };
+        sf::Vector2f(screenWidth * 0.15f, screenHeight * 0.2f),
+        sf::Vector2f(screenWidth * 0.25f, screenHeight * 0.4f),
+        sf::Vector2f(screenWidth * 0.15f, screenHeight * 0.6f)};
 
     std::vector<sf::Vector2f> rightPositions = {
-        sf::Vector2f(screenWidth * 0.85f, screenHeight * 0.2f), // Top monster
-        sf::Vector2f(screenWidth * 0.75f, screenHeight * 0.4f), // Middle monster
-        sf::Vector2f(screenWidth * 0.85f, screenHeight * 0.6f)  // Bottom monster
-    };
+        sf::Vector2f(screenWidth * 0.85f, screenHeight * 0.2f),
+        sf::Vector2f(screenWidth * 0.75f, screenHeight * 0.4f),
+        sf::Vector2f(screenWidth * 0.85f, screenHeight * 0.6f)};
+
+    // Test animation (you can remove this later)
+    static bool animationAdded = false;
+    if (!animationAdded && animationQueue.empty())
+    {
+        queueAnimation(ATTACKING, 0, 0, 1.0f); // 1 second attack
+        queueAnimation(DEFENDING, 0, 0, 1.0f); // 1 second defend
+        animationAdded = true;
+    }
+
+    BattleAnimation *currentAnim = getCurrentAnimation();
+    if (currentAnim)
+    {
+        drawBattleWithAnimation(window, *currentAnim, leftPositions, rightPositions);
+    }
 
     // Helper function to draw resource bars
     auto drawResourceBars = [&](float x, float y, Monster &monster)
@@ -268,16 +307,16 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager
 
     if (true) // change this to a method to see if it's your monster's turn
     {
-        drawAttackMenu(window, engine, selection, screenWidth, screenHeight);
+        drawAttackMenu(window, selection, screenWidth, screenHeight, menuOptions);
     }
 }
 
-void Render::drawAttackMenu(sf::RenderWindow &window, Engine &engine, int &selection, int screenWidth, int screenHeight)
+void Render::drawAttackMenu(sf::RenderWindow &window, int &selection, int screenWidth, int screenHeight, std::vector<std::string> menuOptions)
 {
-    std::string move1 = engine.menuOptions[0];
-    std::string move2 = engine.menuOptions[1];
-    std::string move3 = engine.menuOptions[2];
-    std::string switchMonster = engine.menuOptions[3];
+    std::string move1 = menuOptions[0];
+    std::string move2 = menuOptions[1];
+    std::string move3 = menuOptions[2];
+    std::string switchMonster = menuOptions[3];
 
     sf::Text text(move1, font);
     text.setCharacterSize(SQUARE_SIZE);
@@ -336,15 +375,15 @@ void Render::drawAttackMenu(sf::RenderWindow &window, Engine &engine, int &selec
     window.draw(text4);
 }
 
-void Render::drawMenu(sf::RenderWindow &window, Engine &engine, int &selection)
+void Render::drawMenu(sf::RenderWindow &window, int &selection, std::vector<std::string> menuOptions)
 {
     const int SPACING = SQUARE_SIZE * 2; // Space between options
     const int START_X = 200;             // Starting X position
     const int START_Y = 200;             // Y position for all options
 
-    for (size_t i = 0; i < engine.menuOptions.size(); i++)
+    for (size_t i = 0; i < menuOptions.size(); i++)
     {
-        sf::Text text(engine.menuOptions[i], font);
+        sf::Text text(menuOptions[i], font);
         text.setCharacterSize(SQUARE_SIZE);
         text.setPosition(START_X, START_Y + (i * SPACING));
 
@@ -372,4 +411,43 @@ void Render::drawMap(sf::RenderWindow &window, const MapHandler &map)
             drawTile(window, map.getCurrentTile(i, j), i, j);
         }
     }
+}
+
+void Render::drawBattleWithAnimation(sf::RenderWindow &window, const BattleAnimation &anim,
+                                     std::vector<sf::Vector2f> &leftPositions,
+                                     std::vector<sf::Vector2f> &rightPositions)
+{
+    // Apply different visual effects based on animation state
+    switch (anim.state)
+    {
+    case ATTACKING:
+        // Move the attacking monster forward
+        if (anim.sourceIndex < leftPositions.size())
+        {
+            leftPositions[anim.sourceIndex].x += 50.0f * sin(anim.elapsed * 3.14159f);
+        }
+        break;
+
+    case DEFENDING:
+        // Make the defending monster bounce
+        if (anim.targetIndex < rightPositions.size())
+        {
+            rightPositions[anim.targetIndex].y += 20.0f * sin(anim.elapsed * 6.28318f);
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
+void Render::setReferences(sf::RenderWindow &w, MapHandler &m, Player &p,
+                           MonsterManager &mm, Environment &env, Battle &b)
+{
+    window = &w;
+    map = &m;
+    player = &p;
+    monsterManager = &mm;
+    environment = &env;
+    battle = &b;
 }
