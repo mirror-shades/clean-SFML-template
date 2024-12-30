@@ -109,24 +109,32 @@ void Engine::battleTick(Player &player, Environment &environment, Battle &battle
         allMonsters.push_back(&monster);
     }
 
+    // Constants for battle timing
+    const float BASE_TURN_THRESHOLD = 100.0f;      // Points needed for a turn
+    const float MOVE_THRESHOLD_MULTIPLIER = 10.0f; // Base multiplier for move points
+
     // Accumulate turn points and find ready monsters
     for (auto *monster : allMonsters)
     {
         if (monster->currentStats.health <= 0)
             continue; // Skip dead monsters
 
-        monster->turnPoints += monster->currentStats.speed / 2;
-        monster->movePoints += monster->currentStats.specialAttack / 8;
+        // Scale speed to a reasonable rate (e.g., fastest monsters take ~2-3 seconds for a turn)
+        monster->turnPoints += monster->currentStats.speed * 0.1f;
+        monster->movePoints += monster->currentStats.specialAttack * 0.2f;
 
-        // Only add to ready list if they have 1000+ points
-        if (monster->turnPoints >= 1000)
+        // Only add to ready list if they have enough points
+        if (monster->turnPoints >= BASE_TURN_THRESHOLD)
         {
             readyToAct.push_back(monster);
-            monster->turnPoints = 0; // Deduct points immediately
+            monster->turnPoints = 0; // Reset points
         }
-        if (monster->movePoints >= monster->currentStats.specialAttack * 5)
+
+        // Cap move points at threshold
+        float moveThreshold = monster->currentStats.specialAttack * MOVE_THRESHOLD_MULTIPLIER;
+        if (monster->movePoints >= moveThreshold)
         {
-            monster->movePoints = monster->currentStats.specialAttack * 5;
+            monster->movePoints = moveThreshold;
         }
     }
 

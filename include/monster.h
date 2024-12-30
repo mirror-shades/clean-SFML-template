@@ -85,7 +85,7 @@ inline void initializeMonsterTypes()
         1,         // id
         FIRE,      // element
         "Phoenix", // name
-        10.0f,     // baseHealth
+        8.0f,      // baseHealth
         7.5f,      // baseAttack
         9.0f,      // baseSpecialAttack
         6.0f,      // baseDefense
@@ -115,7 +115,7 @@ inline void initializeMonsterTypes()
         "Ifrit",
         11.0f, // baseHealth
         9.0f,  // baseAttack
-        8.5f,  // baseSpecialAttack
+        7.5f,  // baseSpecialAttack
         7.0f,  // baseDefense
         6.5f,  // baseSpecialDefense
         8.0f,  // baseAccuracy

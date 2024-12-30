@@ -19,7 +19,7 @@ Monster MonsterManager::createMonster(int type, Faction faction)
     baseStats.name = baseType.name;
 
     // Multiply base stats by random multiplier and round to integer
-    baseStats.health = static_cast<int>(baseType.baseHealth * dis(gen) * 10);
+    baseStats.health = static_cast<int>(baseType.baseHealth * dis(gen) * 15 + 50);
     baseStats.attack = static_cast<int>(baseType.baseAttack * dis(gen) * 10);
     baseStats.specialAttack = static_cast<int>(baseType.baseSpecialAttack * dis(gen) * 10);
     baseStats.defense = static_cast<int>(baseType.baseDefense * dis(gen) * 10);

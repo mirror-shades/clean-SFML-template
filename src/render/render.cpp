@@ -176,6 +176,7 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager
     // Helper function to draw resource bars
     auto drawResourceBars = [&](float x, float y, Monster &monster)
     {
+        const float MOVE_THRESHOLD_MULTIPLIER = 10.0f;
         const float BAR_WIDTH = 60.0f;
         const float BAR_HEIGHT = 5.0f;
         const float BAR_SPACING = 2.0f;
@@ -192,14 +193,16 @@ void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager
         sf::RectangleShape mpBar(sf::Vector2f(BAR_WIDTH, BAR_HEIGHT));
         mpBar.setFillColor(sf::Color::Blue);
         mpBar.setPosition(x - BAR_WIDTH / 2, y + BAR_HEIGHT + BAR_SPACING);
-        mpBar.setScale(static_cast<float>(monster.movePoints) / (monster.currentStats.specialAttack * 5), 1.0f);
+        mpBar.setScale(static_cast<float>(monster.movePoints) /
+                           (monster.currentStats.specialAttack * MOVE_THRESHOLD_MULTIPLIER),
+                       1.0f);
         window.draw(mpBar);
 
         // TP Bar (Yellow)
         sf::RectangleShape tpBar(sf::Vector2f(BAR_WIDTH, BAR_HEIGHT));
         tpBar.setFillColor(sf::Color::Yellow);
         tpBar.setPosition(x - BAR_WIDTH / 2, y + (BAR_HEIGHT + BAR_SPACING) * 2);
-        tpBar.setScale(static_cast<float>(monster.turnPoints) / 1000, 1.0f);
+        tpBar.setScale(static_cast<float>(monster.turnPoints) / 100, 1.0f);
         window.draw(tpBar);
     };
 
