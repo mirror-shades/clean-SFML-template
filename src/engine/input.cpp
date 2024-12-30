@@ -3,7 +3,7 @@
 #include "input.h"
 #include "engine.h"
 
-std::pair<bool, bool> InputManager::handleInput(sf::Event event, Player &player, MonsterManager &monsterManager, MapHandler &map, Engine &engine, int &selection)
+std::pair<bool, bool> InputManager::handleInput(sf::Event event, Player &player, MonsterManager &monsterManager, MapHandler &map, Engine &engine, Battle &battle, int &selection)
 {
     bool playerMoved = false;
     if (event.type == sf::Event::KeyPressed)
@@ -26,7 +26,7 @@ std::pair<bool, bool> InputManager::handleInput(sf::Event event, Player &player,
         }
         if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
         {
-            return {handleBattleInput(event, selection, player, engine), playerMoved};
+            return {handleBattleInput(event, selection, player, engine, battle), playerMoved};
         }
         if (engine.getState() == GAME_LEVEL_SELECT)
         {
@@ -38,17 +38,14 @@ std::pair<bool, bool> InputManager::handleInput(sf::Event event, Player &player,
 
 bool InputManager::handleLevelSelectInput(sf::Event event, int &selection, Engine &engine, Player &player)
 {
-    std::cout << "Current selection: " << selection << std::endl;
 
     if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
     {
         selection = updateSelection(3, -1, selection);
-        std::cout << "Up pressed, new selection: " << selection << std::endl;
     }
     if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
     {
         selection = updateSelection(3, 1, selection);
-        std::cout << "Down pressed, new selection: " << selection << std::endl;
     }
     // this function will also take level options then construct an environment with the selected element
     // for now just switch to the default level
@@ -83,7 +80,7 @@ void InputManager::handleMenuSelection(std::string selection, Player &player, Mo
     player.addMonster(2, monsterManager);
 }
 
-bool InputManager::handleBattleInput(sf::Event event, int &selection, Player &player, Engine &engine)
+bool InputManager::handleBattleInput(sf::Event event, int &selection, Player &player, Engine &engine, Battle &battle)
 {
     if (event.type == sf::Event::KeyPressed)
     {
@@ -100,8 +97,8 @@ bool InputManager::handleBattleInput(sf::Event event, int &selection, Player &pl
             if (engine.menuOptions[selection] == "Switch")
             {
                 engine.setState(GAME_RUNNING, player);
+                battle.deinit(player);
                 std::vector<Monster> playerMonsters = player.getActiveMonsters();
-                engine.restorePlayerMonsters(playerMonsters, player);
             }
             else if (engine.menuOptions[selection] == "-")
             {

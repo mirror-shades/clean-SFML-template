@@ -13,27 +13,25 @@ Monster MonsterManager::createMonster(int type, Faction faction)
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dis(0.9f, 1.0f);
 
-    Monster monster;
-    monster.id = baseType.id;
-    monster.element = baseType.element;
-    monster.name = baseType.name;
+    BaseMonster baseStats;
+    baseStats.id = baseType.id;
+    baseStats.element = baseType.element;
+    baseStats.name = baseType.name;
 
     // Multiply base stats by random multiplier and round to integer
-    monster.health = static_cast<int>(baseType.baseHealth * dis(gen) * 10);
-    monster.currentHealth = monster.health;
-    monster.attack = static_cast<int>(baseType.baseAttack * dis(gen) * 10);
-    monster.specialAttack = static_cast<int>(baseType.baseSpecialAttack * dis(gen) * 10);
-    monster.defense = static_cast<int>(baseType.baseDefense * dis(gen) * 10);
-    monster.specialDefense = static_cast<int>(baseType.baseSpecialDefense * dis(gen) * 10);
-    monster.magic = static_cast<int>(baseType.baseMagic * dis(gen) * 10);
-    monster.accuracy = static_cast<int>(baseType.baseAccuracy * dis(gen) * 10);
-    monster.evasion = static_cast<int>(baseType.baseEvasion * dis(gen) * 10);
-    monster.speed = static_cast<int>(baseType.baseSpeed * dis(gen) * 10);
-    monster.currentTurnPoints = 0;
-    monster.currentMovePoints = 0;
-    monster.moves.push_back(moveTypes[baseType.initialMove]);
-    monster.uid = totalMonsters;
-    monster.faction = faction;
+    baseStats.health = static_cast<int>(baseType.baseHealth * dis(gen) * 10);
+    baseStats.attack = static_cast<int>(baseType.baseAttack * dis(gen) * 10);
+    baseStats.specialAttack = static_cast<int>(baseType.baseSpecialAttack * dis(gen) * 10);
+    baseStats.defense = static_cast<int>(baseType.baseDefense * dis(gen) * 10);
+    baseStats.specialDefense = static_cast<int>(baseType.baseSpecialDefense * dis(gen) * 10);
+    baseStats.accuracy = static_cast<int>(baseType.baseAccuracy * dis(gen) * 10);
+    baseStats.evasion = static_cast<int>(baseType.baseEvasion * dis(gen) * 10);
+    baseStats.speed = static_cast<int>(baseType.baseSpeed * dis(gen) * 10);
+    baseStats.moves.push_back(moveTypes[baseType.initialMove]);
+    baseStats.uid = totalMonsters;
+    baseStats.faction = faction;
+
+    Monster monster(baseStats);
 
     totalMonsters++;
     return monster;
@@ -51,18 +49,17 @@ void MonsterManager::initializeMoveTypes()
 
 void MonsterManager::printMonster(Monster monster)
 {
-    std::cout << "Monster: " << monster.name << std::endl;
-    std::cout << "Health: " << monster.health << std::endl;
-    std::cout << "Attack: " << monster.attack << std::endl;
-    std::cout << "Special Attack: " << monster.specialAttack << std::endl;
-    std::cout << "Defense: " << monster.defense << std::endl;
-    std::cout << "Special Defense: " << monster.specialDefense << std::endl;
-    std::cout << "Magic: " << monster.magic << std::endl;
-    std::cout << "Accuracy: " << monster.accuracy << std::endl;
-    std::cout << "Evasion: " << monster.evasion << std::endl;
-    std::cout << "Speed: " << monster.speed << std::endl;
-    for (Move move : monster.moves)
+    std::cout << "Monster: " << monster.baseStats.name << std::endl;
+    std::cout << "Health: " << monster.baseStats.health << std::endl;
+    std::cout << "Attack: " << monster.baseStats.attack << std::endl;
+    std::cout << "Special Attack: " << monster.baseStats.specialAttack << std::endl;
+    std::cout << "Defense: " << monster.baseStats.defense << std::endl;
+    std::cout << "Special Defense: " << monster.baseStats.specialDefense << std::endl;
+    std::cout << "Accuracy: " << monster.baseStats.accuracy << std::endl;
+    std::cout << "Evasion: " << monster.baseStats.evasion << std::endl;
+    std::cout << "Speed: " << monster.baseStats.speed << std::endl;
+    for (Move move : monster.baseStats.moves)
     {
-        std::cout << "Move: " << move.name << std::endl;
+        std::cout << "Move: " << move.moveName << std::endl;
     }
 }

@@ -21,13 +21,12 @@ class Engine
 public:
     std::vector<std::string> menuOptions;
     gameState getState();
-    void checkGrass(MapHandler &map, Player &player, Environment &environment, MonsterManager &monsterManager);
+    void checkGrass(MapHandler &map, Player &player, Environment &environment, MonsterManager &monsterManager, Battle &battle);
     void setState(gameState newState, Player &player);
     bool movePlayer(sf::Event event, Player &player, MapHandler &map);
     void battleTick(Player &player, Environment &environment, Battle &battle);
     void determineTurnOrder(std::vector<Monster> &monsters);
-    void checkIfMonsterDies(std::vector<Monster> &playerMonsters, std::vector<Monster> &enemyMonsters, Environment &environment, Player &player);
-    void restorePlayerMonsters(std::vector<Monster> &playerMonsters, Player &player);
+    void checkIfMonsterDies(std::vector<Monster> &playerBattleMonsters, std::vector<Monster> &enemyBattleMonsters, Environment &environment, Player &player, Battle &battle);
 
 private:
     gameState state = GAME_MAIN_MENU;

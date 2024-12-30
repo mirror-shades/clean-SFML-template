@@ -89,11 +89,11 @@ int main()
 
             if (event.type == sf::Event::KeyPressed)
             {
-                std::pair<bool, bool> inputResult = inputManager.handleInput(event, player, monsterManager, map, engine, render.selection);
+                std::pair<bool, bool> inputResult = inputManager.handleInput(event, player, monsterManager, map, engine, battle, render.selection);
                 needsUpdate = inputResult.first;
                 if (inputResult.second)
                 {
-                    engine.checkGrass(map, player, environment, monsterManager);
+                    engine.checkGrass(map, player, environment, monsterManager, battle);
                 }
             }
         }
@@ -112,7 +112,7 @@ int main()
         if (needsUpdate)
         {
             window.clear();
-            render.drawScreen(window, engine, map, player, monsterManager, environment, render.selection);
+            render.drawScreen(window, engine, map, player, monsterManager, environment, render.selection, battle);
             window.display();
             needsUpdate = false;
         }

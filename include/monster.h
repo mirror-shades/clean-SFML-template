@@ -16,7 +16,6 @@ struct MonsterType
     float baseSpecialAttack;
     float baseDefense;
     float baseSpecialDefense;
-    float baseMagic;
     float baseAccuracy;
     float baseEvasion;
     float baseSpeed;
@@ -31,7 +30,7 @@ enum class Faction
     ENEMY
 };
 
-struct Monster
+struct BaseMonster
 {
     int id;
     int uid;
@@ -41,21 +40,35 @@ struct Monster
     int currentHealth;
     int attack;
     int specialAttack;
-    int currentMovePoints;
     int defense;
     int specialDefense;
-    int magic;
     int accuracy;
     int evasion;
     int speed;
-    int currentTurnPoints;
     std::vector<Move> moves;
     bool canAct;
     Faction faction;
+};
+
+struct Monster
+{
+    BaseMonster currentStats;
+    BaseMonster baseStats;
+    int turnPoints;
+    int movePoints;
+
+    Monster(const BaseMonster &base)
+        : currentStats(base), baseStats(base), turnPoints(0), movePoints(0) {}
+
+    Monster(const Monster &other)
+        : currentStats(other.currentStats), baseStats(other.baseStats),
+          turnPoints(other.turnPoints), movePoints(other.movePoints) {}
+
+    Monster &operator=(const Monster &other) = default;
 
     bool operator==(const Monster &other) const
     {
-        return uid == other.uid;
+        return baseStats.uid == other.baseStats.uid;
     }
 };
 
@@ -77,7 +90,6 @@ inline void initializeMonsterTypes()
         9.0f,      // baseSpecialAttack
         6.0f,      // baseDefense
         7.0f,      // baseSpecialDefense
-        8.5f,      // baseMagic
         8.0f,      // baseAccuracy
         7.5f,      // baseEvasion
         9.0f,      // baseSpeed
@@ -92,11 +104,10 @@ inline void initializeMonsterTypes()
         8.0f, // baseSpecialAttack
         6.5f, // baseDefense
         6.0f, // baseSpecialDefense
-        7.0f, // baseMagic
         8.0f, // baseAccuracy
         7.0f, // baseEvasion
         8.5f, // baseSpeed
-        5};
+        1};
 
     MonsterType ifrit = {
         6,
@@ -107,11 +118,10 @@ inline void initializeMonsterTypes()
         8.5f,  // baseSpecialAttack
         7.0f,  // baseDefense
         6.5f,  // baseSpecialDefense
-        7.5f,  // baseMagic
         8.0f,  // baseAccuracy
         7.0f,  // baseEvasion
         8.0f,  // baseSpeed
-        6};
+        1};
 
     MonsterType pyreclaw = {
         7,
@@ -122,11 +132,10 @@ inline void initializeMonsterTypes()
         8.0f,  // baseSpecialAttack
         5.5f,  // baseDefense
         6.5f,  // baseSpecialDefense
-        6.5f,  // baseMagic
         7.5f,  // baseAccuracy
         8.0f,  // baseEvasion
         8.5f,  // baseSpeed
-        7};
+        1};
 
     // =========================
     // WATER
@@ -140,11 +149,10 @@ inline void initializeMonsterTypes()
         8.5f,        // baseSpecialAttack
         8.0f,        // baseDefense
         8.5f,        // baseSpecialDefense
-        7.5f,        // baseMagic
         8.5f,        // baseAccuracy
         7.0f,        // baseEvasion
         6.5f,        // baseSpeed
-        2};
+        3};
 
     MonsterType kraken = {
         8,
@@ -155,11 +163,10 @@ inline void initializeMonsterTypes()
         8.0f,  // baseSpecialAttack
         7.5f,  // baseDefense
         8.0f,  // baseSpecialDefense
-        8.0f,  // baseMagic
         7.5f,  // baseAccuracy
         6.5f,  // baseEvasion
         5.5f,  // baseSpeed
-        8};
+        3};
 
     MonsterType tidalon = {
         9,
@@ -170,11 +177,10 @@ inline void initializeMonsterTypes()
         9.0f,  // baseSpecialAttack
         7.5f,  // baseDefense
         9.0f,  // baseSpecialDefense
-        7.0f,  // baseMagic
         8.0f,  // baseAccuracy
         6.5f,  // baseEvasion
         6.0f,  // baseSpeed
-        9};
+        3};
 
     MonsterType nautilus = {
         10,
@@ -185,11 +191,10 @@ inline void initializeMonsterTypes()
         8.0f,  // baseSpecialAttack
         7.0f,  // baseDefense
         7.5f,  // baseSpecialDefense
-        8.5f,  // baseMagic
         7.5f,  // baseAccuracy
         7.0f,  // baseEvasion
         6.0f,  // baseSpeed
-        10};
+        3};
 
     // =========================
     // EARTH
@@ -203,11 +208,10 @@ inline void initializeMonsterTypes()
         6.0f,    // baseSpecialAttack
         10.0f,   // baseDefense
         9.0f,    // baseSpecialDefense
-        4.5f,    // baseMagic
         7.0f,    // baseAccuracy
         4.0f,    // baseEvasion
         3.0f,    // baseSpeed
-        3};
+        2};
 
     MonsterType terrafin = {
         11,
@@ -218,11 +222,10 @@ inline void initializeMonsterTypes()
         5.5f,  // baseSpecialAttack
         9.0f,  // baseDefense
         8.5f,  // baseSpecialDefense
-        5.0f,  // baseMagic
         6.5f,  // baseAccuracy
         4.5f,  // baseEvasion
         3.0f,  // baseSpeed
-        11};
+        2};
 
     MonsterType quakebeast = {
         12,
@@ -233,11 +236,10 @@ inline void initializeMonsterTypes()
         5.0f,  // baseSpecialAttack
         10.5f, // baseDefense
         9.5f,  // baseSpecialDefense
-        4.0f,  // baseMagic
         6.0f,  // baseAccuracy
         4.0f,  // baseEvasion
         2.5f,  // baseSpeed
-        12};
+        2};
 
     MonsterType duramole = {
         13,
@@ -248,11 +250,10 @@ inline void initializeMonsterTypes()
         6.0f,  // baseSpecialAttack
         9.0f,  // baseDefense
         8.0f,  // baseSpecialDefense
-        4.5f,  // baseMagic
         6.5f,  // baseAccuracy
         5.0f,  // baseEvasion
         3.5f,  // baseSpeed
-        13};
+        2};
 
     // =========================
     // AIR
@@ -266,7 +267,6 @@ inline void initializeMonsterTypes()
         8.5f,    // baseSpecialAttack
         5.0f,    // baseDefense
         6.5f,    // baseSpecialDefense
-        9.5f,    // baseMagic
         9.5f,    // baseAccuracy
         10.0f,   // baseEvasion
         10.0f,   // baseSpeed
@@ -281,11 +281,10 @@ inline void initializeMonsterTypes()
         8.0f, // baseSpecialAttack
         4.5f, // baseDefense
         6.0f, // baseSpecialDefense
-        9.0f, // baseMagic
         9.5f, // baseAccuracy
         9.0f, // baseEvasion
         9.5f, // baseSpeed
-        14};
+        4};
 
     MonsterType stratus = {
         15,
@@ -296,11 +295,10 @@ inline void initializeMonsterTypes()
         7.5f, // baseSpecialAttack
         5.0f, // baseDefense
         5.5f, // baseSpecialDefense
-        8.5f, // baseMagic
         9.0f, // baseAccuracy
         9.0f, // baseEvasion
         9.0f, // baseSpeed
-        15};
+        4};
 
     MonsterType cloudweaver = {
         16,
@@ -311,11 +309,10 @@ inline void initializeMonsterTypes()
         9.5f,  // baseSpecialAttack
         4.0f,  // baseDefense
         6.0f,  // baseSpecialDefense
-        10.0f, // baseMagic
         9.5f,  // baseAccuracy
         10.5f, // baseEvasion
         10.5f, // baseSpeed
-        16};
+        4};
 
     // =========================
     // CYBERNETIC
@@ -329,7 +326,6 @@ inline void initializeMonsterTypes()
         7.5f,  // baseSpecialAttack
         9.0f,  // baseDefense
         8.5f,  // baseSpecialDefense
-        5.0f,  // baseMagic
         8.0f,  // baseAccuracy
         5.5f,  // baseEvasion
         5.0f,  // baseSpeed
@@ -344,7 +340,6 @@ inline void initializeMonsterTypes()
         9.0f, // baseSpecialAttack
         6.0f, // baseDefense
         6.5f, // baseSpecialDefense
-        9.0f, // baseMagic
         9.5f, // baseAccuracy
         6.0f, // baseEvasion
         7.0f, // baseSpeed
@@ -359,8 +354,7 @@ inline void initializeMonsterTypes()
         8.5f, // baseSpecialAttack
         5.5f, // baseDefense
         6.5f, // baseSpecialDefense
-        8.5f, // baseMagic
-        9.0f, // baseAccuracy
+        8.5f, // baseAccuracy
         7.0f, // baseEvasion
         8.0f, // baseSpeed
         19};
@@ -374,7 +368,6 @@ inline void initializeMonsterTypes()
         7.0f,  // baseSpecialAttack
         9.5f,  // baseDefense
         8.0f,  // baseSpecialDefense
-        6.0f,  // baseMagic
         7.5f,  // baseAccuracy
         5.5f,  // baseEvasion
         6.0f,  // baseSpeed
@@ -387,30 +380,28 @@ inline void initializeMonsterTypes()
         21,
         ELDRITCH,
         "Cultling",
-        9.0f,  // baseHealth
-        5.5f,  // baseAttack
-        9.0f,  // baseSpecialAttack
-        5.0f,  // baseDefense
-        7.0f,  // baseSpecialDefense
-        10.0f, // baseMagic
-        6.0f,  // baseAccuracy
-        7.0f,  // baseEvasion
-        5.5f,  // baseSpeed
+        9.0f, // baseHealth
+        5.5f, // baseAttack
+        9.0f, // baseSpecialAttack
+        5.0f, // baseDefense
+        7.0f, // baseSpecialDefense
+        6.0f, // baseAccuracy
+        7.0f, // baseEvasion
+        5.5f, // baseSpeed
         21};
 
     MonsterType nyarlapup = {
         22,
         ELDRITCH,
         "Nyarlapup",
-        8.5f,  // baseHealth
-        5.0f,  // baseAttack
-        8.0f,  // baseSpecialAttack
-        4.5f,  // baseDefense
-        6.5f,  // baseSpecialDefense
-        10.5f, // baseMagic
-        5.5f,  // baseAccuracy
-        7.5f,  // baseEvasion
-        6.0f,  // baseSpeed
+        8.5f, // baseHealth
+        5.0f, // baseAttack
+        8.0f, // baseSpecialAttack
+        4.5f, // baseDefense
+        6.5f, // baseSpecialDefense
+        5.5f, // baseAccuracy
+        7.5f, // baseEvasion
+        6.0f, // baseSpeed
         22};
 
     MonsterType shogghorn = {
@@ -422,7 +413,6 @@ inline void initializeMonsterTypes()
         7.5f,  // baseSpecialAttack
         6.5f,  // baseDefense
         8.0f,  // baseSpecialDefense
-        9.0f,  // baseMagic
         5.0f,  // baseAccuracy
         5.5f,  // baseEvasion
         5.0f,  // baseSpeed
@@ -437,7 +427,6 @@ inline void initializeMonsterTypes()
         9.5f,  // baseSpecialAttack
         7.0f,  // baseDefense
         9.5f,  // baseSpecialDefense
-        10.0f, // baseMagic
         6.0f,  // baseAccuracy
         5.0f,  // baseEvasion
         4.5f,  // baseSpeed
@@ -455,7 +444,6 @@ inline void initializeMonsterTypes()
         6.5f, // baseSpecialAttack
         5.5f, // baseDefense
         5.0f, // baseSpecialDefense
-        6.0f, // baseMagic
         7.0f, // baseAccuracy
         7.5f, // baseEvasion
         8.0f, // baseSpeed
@@ -470,7 +458,6 @@ inline void initializeMonsterTypes()
         7.5f, // baseSpecialAttack
         4.5f, // baseDefense
         4.0f, // baseSpecialDefense
-        7.0f, // baseMagic
         7.5f, // baseAccuracy
         8.0f, // baseEvasion
         8.5f, // baseSpeed
@@ -485,7 +472,6 @@ inline void initializeMonsterTypes()
         6.0f,  // baseSpecialAttack
         5.0f,  // baseDefense
         5.5f,  // baseSpecialDefense
-        6.5f,  // baseMagic
         6.0f,  // baseAccuracy
         6.0f,  // baseEvasion
         7.0f,  // baseSpeed
@@ -500,7 +486,6 @@ inline void initializeMonsterTypes()
         7.0f, // baseSpecialAttack
         4.5f, // baseDefense
         4.5f, // baseSpecialDefense
-        8.5f, // baseMagic
         6.5f, // baseAccuracy
         7.0f, // baseEvasion
         8.5f, // baseSpeed
@@ -518,7 +503,6 @@ inline void initializeMonsterTypes()
         8.5f,  // baseSpecialAttack
         8.0f,  // baseDefense
         9.0f,  // baseSpecialDefense
-        7.5f,  // baseMagic
         8.0f,  // baseAccuracy
         6.5f,  // baseEvasion
         7.0f,  // baseSpeed
@@ -533,7 +517,6 @@ inline void initializeMonsterTypes()
         9.0f,  // baseSpecialAttack
         9.0f,  // baseDefense
         9.5f,  // baseSpecialDefense
-        7.0f,  // baseMagic
         7.5f,  // baseAccuracy
         6.0f,  // baseEvasion
         6.0f,  // baseSpeed
@@ -548,7 +531,6 @@ inline void initializeMonsterTypes()
         10.0f, // baseSpecialAttack
         7.5f,  // baseDefense
         8.5f,  // baseSpecialDefense
-        8.0f,  // baseMagic
         8.5f,  // baseAccuracy
         7.0f,  // baseEvasion
         7.5f,  // baseSpeed
@@ -563,7 +545,6 @@ inline void initializeMonsterTypes()
         8.0f,  // baseSpecialAttack
         9.0f,  // baseDefense
         8.0f,  // baseSpecialDefense
-        7.5f,  // baseMagic
         7.0f,  // baseAccuracy
         6.0f,  // baseEvasion
         6.5f,  // baseSpeed
@@ -581,7 +562,6 @@ inline void initializeMonsterTypes()
         8.0f, // baseSpecialAttack
         5.5f, // baseDefense
         6.0f, // baseSpecialDefense
-        7.0f, // baseMagic
         9.0f, // baseAccuracy
         7.5f, // baseEvasion
         9.5f, // baseSpeed
@@ -596,7 +576,6 @@ inline void initializeMonsterTypes()
         8.5f, // baseSpecialAttack
         6.5f, // baseDefense
         7.0f, // baseSpecialDefense
-        7.5f, // baseMagic
         8.5f, // baseAccuracy
         7.0f, // baseEvasion
         9.0f, // baseSpeed
@@ -611,7 +590,6 @@ inline void initializeMonsterTypes()
         8.0f,  // baseSpecialAttack
         7.0f,  // baseDefense
         7.5f,  // baseSpecialDefense
-        6.5f,  // baseMagic
         7.0f,  // baseAccuracy
         6.5f,  // baseEvasion
         8.0f,  // baseSpeed
@@ -626,7 +604,6 @@ inline void initializeMonsterTypes()
         7.5f,  // baseSpecialAttack
         6.0f,  // baseDefense
         6.5f,  // baseSpecialDefense
-        7.0f,  // baseMagic
         8.0f,  // baseAccuracy
         7.0f,  // baseEvasion
         8.5f,  // baseSpeed
@@ -644,7 +621,6 @@ inline void initializeMonsterTypes()
         8.0f,  // baseSpecialAttack
         8.0f,  // baseDefense
         8.0f,  // baseSpecialDefense
-        7.5f,  // baseMagic
         7.5f,  // baseAccuracy
         6.5f,  // baseEvasion
         7.5f,  // baseSpeed
@@ -659,7 +635,6 @@ inline void initializeMonsterTypes()
         7.5f, // baseSpecialAttack
         6.5f, // baseDefense
         6.5f, // baseSpecialDefense
-        6.0f, // baseMagic
         6.5f, // baseAccuracy
         7.0f, // baseEvasion
         7.0f, // baseSpeed
@@ -674,7 +649,6 @@ inline void initializeMonsterTypes()
         7.0f,  // baseSpecialAttack
         8.5f,  // baseDefense
         7.5f,  // baseSpecialDefense
-        6.5f,  // baseMagic
         7.0f,  // baseAccuracy
         6.5f,  // baseEvasion
         6.5f,  // baseSpeed
@@ -689,7 +663,6 @@ inline void initializeMonsterTypes()
         8.5f,  // baseSpecialAttack
         7.0f,  // baseDefense
         7.0f,  // baseSpecialDefense
-        7.5f,  // baseMagic
         7.5f,  // baseAccuracy
         7.0f,  // baseEvasion
         8.0f,  // baseSpeed
@@ -707,7 +680,6 @@ inline void initializeMonsterTypes()
         9.5f, // baseSpecialAttack
         6.0f, // baseDefense
         7.0f, // baseSpecialDefense
-        9.0f, // baseMagic
         8.0f, // baseAccuracy
         7.5f, // baseEvasion
         7.0f, // baseSpeed
@@ -722,7 +694,6 @@ inline void initializeMonsterTypes()
         10.0f, // baseSpecialAttack
         5.5f,  // baseDefense
         7.5f,  // baseSpecialDefense
-        9.5f,  // baseMagic
         8.0f,  // baseAccuracy
         7.0f,  // baseEvasion
         7.5f,  // baseSpeed
@@ -737,7 +708,6 @@ inline void initializeMonsterTypes()
         8.5f,  // baseSpecialAttack
         7.5f,  // baseDefense
         7.5f,  // baseSpecialDefense
-        8.5f,  // baseMagic
         7.5f,  // baseAccuracy
         5.5f,  // baseEvasion
         6.0f,  // baseSpeed
@@ -752,7 +722,6 @@ inline void initializeMonsterTypes()
         9.0f,  // baseSpecialAttack
         6.5f,  // baseDefense
         8.0f,  // baseSpecialDefense
-        9.0f,  // baseMagic
         7.0f,  // baseAccuracy
         7.0f,  // baseEvasion
         7.0f,  // baseSpeed
@@ -770,7 +739,6 @@ inline void initializeMonsterTypes()
         4.5f, // baseSpecialAttack
         6.5f, // baseDefense
         6.0f, // baseSpecialDefense
-        5.0f, // baseMagic
         8.0f, // baseAccuracy
         7.5f, // baseEvasion
         8.0f, // baseSpeed
@@ -785,7 +753,6 @@ inline void initializeMonsterTypes()
         5.0f,  // baseSpecialAttack
         7.0f,  // baseDefense
         7.0f,  // baseSpecialDefense
-        4.5f,  // baseMagic
         7.5f,  // baseAccuracy
         6.5f,  // baseEvasion
         7.5f,  // baseSpeed
@@ -800,7 +767,6 @@ inline void initializeMonsterTypes()
         4.0f,  // baseSpecialAttack
         8.0f,  // baseDefense
         7.5f,  // baseSpecialDefense
-        4.0f,  // baseMagic
         6.0f,  // baseAccuracy
         5.5f,  // baseEvasion
         6.5f,  // baseSpeed
@@ -815,7 +781,6 @@ inline void initializeMonsterTypes()
         5.5f, // baseSpecialAttack
         6.0f, // baseDefense
         5.5f, // baseSpecialDefense
-        6.5f, // baseMagic
         8.0f, // baseAccuracy
         7.0f, // baseEvasion
         8.0f, // baseSpeed
@@ -833,7 +798,6 @@ inline void initializeMonsterTypes()
         6.0f,  // baseSpecialAttack
         6.0f,  // baseDefense
         6.0f,  // baseSpecialDefense
-        6.0f,  // baseMagic
         7.0f,  // baseAccuracy
         6.5f,  // baseEvasion
         6.5f,  // baseSpeed
@@ -848,7 +812,6 @@ inline void initializeMonsterTypes()
         5.0f,  // baseSpecialAttack
         7.5f,  // baseDefense
         7.0f,  // baseSpecialDefense
-        5.5f,  // baseMagic
         6.5f,  // baseAccuracy
         6.0f,  // baseEvasion
         5.5f,  // baseSpeed
@@ -863,7 +826,6 @@ inline void initializeMonsterTypes()
         5.5f, // baseSpecialAttack
         6.5f, // baseDefense
         6.0f, // baseSpecialDefense
-        5.0f, // baseMagic
         7.5f, // baseAccuracy
         7.0f, // baseEvasion
         6.5f, // baseSpeed
@@ -878,7 +840,6 @@ inline void initializeMonsterTypes()
         5.5f,  // baseSpecialAttack
         6.0f,  // baseDefense
         6.5f,  // baseSpecialDefense
-        5.5f,  // baseMagic
         7.0f,  // baseAccuracy
         6.0f,  // baseEvasion
         7.0f,  // baseSpeed

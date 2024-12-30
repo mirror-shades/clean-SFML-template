@@ -10,7 +10,7 @@
 
 std::vector<std::string> menuOptions;
 
-void Engine::checkGrass(MapHandler &map, Player &player, Environment &environment, MonsterManager &monsterManager)
+void Engine::checkGrass(MapHandler &map, Player &player, Environment &environment, MonsterManager &monsterManager, Battle &battle)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -42,18 +42,18 @@ void Engine::setState(gameState newState, Player &player)
     else if (newState == GAME_MONSTER_ENCOUNTERED)
     {
         std::vector<std::string> moves;
-        moves.push_back(player.getActiveMonster(0).moves[0].moveName);
-        if (player.getActiveMonster(0).moves.size() > 1)
+        moves.push_back(player.getActiveMonster(0).currentStats.moves[0].moveName);
+        if (player.getActiveMonster(0).currentStats.moves.size() > 1)
         {
-            moves.push_back(player.getActiveMonster(0).moves[1].moveName);
+            moves.push_back(player.getActiveMonster(0).currentStats.moves[1].moveName);
         }
         else
         {
             moves.push_back("-");
         }
-        if (player.getActiveMonster(0).moves.size() > 2)
+        if (player.getActiveMonster(0).currentStats.moves.size() > 2)
         {
-            moves.push_back(player.getActiveMonster(0).moves[2].moveName);
+            moves.push_back(player.getActiveMonster(0).currentStats.moves[2].moveName);
         }
         else
         {
@@ -97,17 +97,14 @@ void Engine::battleTick(Player &player, Environment &environment, Battle &battle
     static std::random_device rd;
     static std::mt19937 gen(rd());
 
-    auto &playerMonsters = player.getActiveMonsters();
-    auto &enemyMonsters = environment.getEnemyMonsters();
     std::vector<Monster *> allMonsters;
     std::vector<Monster *> readyToAct;
 
-    // Add pointers to all monsters
-    for (auto &monster : playerMonsters)
+    for (auto &monster : player.getActiveMonsters())
     {
         allMonsters.push_back(&monster);
     }
-    for (auto &monster : enemyMonsters)
+    for (auto &monster : environment.getEnemyMonsters())
     {
         allMonsters.push_back(&monster);
     }
@@ -115,68 +112,67 @@ void Engine::battleTick(Player &player, Environment &environment, Battle &battle
     // Accumulate turn points and find ready monsters
     for (auto *monster : allMonsters)
     {
-        if (monster->currentHealth <= 0)
+        if (monster->currentStats.health <= 0)
             continue; // Skip dead monsters
 
-        monster->currentTurnPoints += monster->speed / 4;
-        monster->currentMovePoints += monster->specialAttack / 8;
+        monster->turnPoints += monster->currentStats.speed / 2;
+        monster->movePoints += monster->currentStats.specialAttack / 8;
 
         // Only add to ready list if they have 1000+ points
-        if (monster->currentTurnPoints >= 1000)
+        if (monster->turnPoints >= 1000)
         {
             readyToAct.push_back(monster);
-            monster->currentTurnPoints -= 1000; // Deduct points immediately
+            monster->turnPoints = 0; // Deduct points immediately
         }
-        if (monster->currentMovePoints >= 1000)
+        if (monster->movePoints >= monster->currentStats.specialAttack * 5)
         {
-            monster->currentMovePoints = 1000;
+            monster->movePoints = monster->currentStats.specialAttack * 5;
         }
     }
 
     // Process ready monsters
     for (auto *monster : readyToAct)
     {
-        if (!monster->currentHealth > 0)
+        if (monster->currentStats.health <= 0)
             continue; // Double check they're still alive
 
-        bool isPlayerMonster = std::find_if(playerMonsters.begin(), playerMonsters.end(),
+        bool isPlayerMonster = std::find_if(player.getActiveMonsters().begin(), player.getActiveMonsters().end(),
                                             [monster](Monster &m)
-                                            { return &m == monster; }) != playerMonsters.end();
+                                            { return &m == monster; }) != player.getActiveMonsters().end();
 
         if (isPlayerMonster)
         {
-            battle.executeAIMove(*monster, enemyMonsters);
+            battle.executeAIMove(*monster, environment.getEnemyMonsters());
         }
         else
         {
-            battle.executeAIMove(*monster, playerMonsters);
+            battle.executeAIMove(*monster, player.getActiveMonsters());
         }
     }
 
-    checkIfMonsterDies(playerMonsters, enemyMonsters, environment, player);
+    checkIfMonsterDies(player.getActiveMonsters(), environment.getEnemyMonsters(), environment, player, battle);
 }
 
-void Engine::checkIfMonsterDies(std::vector<Monster> &playerMonsters, std::vector<Monster> &enemyMonsters, Environment &environment, Player &player)
+void Engine::checkIfMonsterDies(std::vector<Monster> &playerBattleMonsters, std::vector<Monster> &enemyBattleMonsters, Environment &environment, Player &player, Battle &battle)
 {
-    // Only remove dead enemy monsters
-    for (auto &monster : enemyMonsters)
+    bool enemyAlive = false;
+    for (auto &monster : enemyBattleMonsters)
     {
-        if (monster.currentHealth <= 0)
+        if (monster.currentStats.health > 0)
         {
-            enemyMonsters.erase(std::remove(enemyMonsters.begin(), enemyMonsters.end(), monster), enemyMonsters.end());
+            enemyAlive = true;
         }
     }
-
-    if (enemyMonsters.empty())
+    if (!enemyAlive)
     {
+        // implement win condition here
         environment.clearEnemyMonsters();
-        restorePlayerMonsters(playerMonsters, player);
         setState(GAME_RUNNING, player);
     }
     bool allyAlive = false;
-    for (auto &monster : playerMonsters)
+    for (auto &monster : playerBattleMonsters)
     {
-        if (monster.currentHealth > 0)
+        if (monster.currentStats.health > 0)
         {
             allyAlive = true;
         }
@@ -185,25 +181,15 @@ void Engine::checkIfMonsterDies(std::vector<Monster> &playerMonsters, std::vecto
     {
         // implement game over here
         environment.clearEnemyMonsters();
-        restorePlayerMonsters(playerMonsters, player);
         setState(GAME_RUNNING, player);
     }
-}
-
-void Engine::restorePlayerMonsters(std::vector<Monster> &playerMonsters, Player &player)
-{
-    for (auto &monster : playerMonsters)
-    {
-        monster.currentHealth = monster.health;
-        monster.currentTurnPoints = 0;
-        monster.currentMovePoints = 0;
-    }
-    player.updateActiveMonsters(playerMonsters);
 }
 
 void Engine::determineTurnOrder(std::vector<Monster> &monsters)
 {
     // sort the monsters by speed
     std::sort(monsters.begin(), monsters.end(), [](Monster &a, Monster &b)
-              { return a.speed > b.speed; });
+              {
+                  return a.currentStats.speed > b.currentStats.speed; // Access the base monster through the BattleMonster wrapper
+              });
 }

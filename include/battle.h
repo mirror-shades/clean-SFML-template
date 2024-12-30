@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "player.h"
+#include "monster.h"
 #include "environment.h"
 
 struct BattleTurn
@@ -16,15 +17,18 @@ struct BattleTurn
 class Battle
 {
 public:
+    void executePlayerMove(Monster &attacker, Monster &target, int moveIndex);
+    void executeAIMove(Monster &attacker, std::vector<Monster> &targets);
+    void deinit(Player &player);
+
+private:
+    std::vector<BattleTurn> battleHistory;
+
     void addTurn(BattleTurn turn);
     void clearBattleHistory();
     BattleTurn getLastTurn();
     std::vector<BattleTurn> getBattleHistory();
-    void executeAIMove(Monster &attacker, std::vector<Monster> &targets);
     float getTypeEffectiveness(ElementType moveType, ElementType targetType);
-    void executePlayerMove(Monster &attacker, Monster &target, int moveIndex);
     int calculateMoveDamage(const Monster &attacker, const Monster &target, const Move &move);
-
-private:
-    std::vector<BattleTurn> battleHistory;
+    void restoreMonsters(Player &player);
 };

@@ -61,7 +61,7 @@ void Render::drawTile(sf::RenderWindow &window, const Tile &tile, int x, int y)
     this->drawSymbol(window, symbolToDraw, x, y);
 }
 
-void Render::drawScreen(sf::RenderWindow &window, Engine &engine, MapHandler &map, Player &player, MonsterManager &monsterManager, Environment &environment, int selection)
+void Render::drawScreen(sf::RenderWindow &window, Engine &engine, MapHandler &map, Player &player, MonsterManager &monsterManager, Environment &environment, int selection, Battle &battle)
 {
 
     if (engine.getState() == GAME_MAIN_MENU)
@@ -76,7 +76,7 @@ void Render::drawScreen(sf::RenderWindow &window, Engine &engine, MapHandler &ma
     }
     if (engine.getState() == GAME_MONSTER_ENCOUNTERED)
     {
-        drawTestBattle(window, player, monsterManager, engine, environment, selection);
+        drawBattle(window, player, monsterManager, engine, environment, selection, battle);
     }
     if (engine.getState() == GAME_LEVEL_SELECT)
     {
@@ -140,7 +140,7 @@ void Render::drawOverlay(sf::RenderWindow &window, Environment &environment, Pla
 {
     // make a rectangle over the top right 3 squares
     sf::RectangleShape rectangle(sf::Vector2f(SQUARE_SIZE * 5, SQUARE_SIZE * 1));
-    rectangle.setFillColor(sf::Color(0, 0, 0, 128)); // Black with 50% opacity (alpha=128)
+    rectangle.setFillColor(sf::Color(0, 0, 0, 75)); // Black with 50% opacity (alpha=128)
     rectangle.setPosition(MAP_WIDTH * SQUARE_SIZE - SQUARE_SIZE * 4, 0);
     window.draw(rectangle);
     // write a word in the top right corner
@@ -155,117 +155,10 @@ void Render::drawOverlay(sf::RenderWindow &window, Environment &environment, Pla
     window.draw(text2);
 }
 
-void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Engine &engine, Environment &environment, int &selection)
+void Render::drawBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Engine &engine, Environment &environment, int &selection, Battle &battle)
 {
     int screenWidth = MAP_WIDTH * SQUARE_SIZE;
     int screenHeight = MAP_HEIGHT * SQUARE_SIZE;
-
-    // Add player monster sprite drawing
-    sf::Texture playerMonsterTexture;
-    sf::Sprite playerMonsterSprite;
-    std::string playerMonsterName = player.getActiveMonster().name;
-    std::string playerMonsterImagePath = "assets/images/" + playerMonsterName + ".png";
-
-    if (playerMonsterTexture.loadFromFile(playerMonsterImagePath))
-    {
-        playerMonsterSprite.setTexture(playerMonsterTexture);
-        // Scale down by 50%
-        playerMonsterSprite.setScale(0.5f, 0.5f);
-        // Position the monster on the center left side
-        playerMonsterSprite.setPosition(
-            screenWidth / 4 - (playerMonsterSprite.getLocalBounds().width * 0.5f) / 2,
-            screenHeight * 1 / 3 - (playerMonsterSprite.getLocalBounds().height * 0.5f) / 2);
-        window.draw(playerMonsterSprite);
-    }
-
-    // Add enemy monster sprite drawing
-    sf::Texture enemyMonsterTexture;
-    sf::Sprite enemyMonsterSprite;
-    std::string enemyMonsterName = environment.getEnemyMonsters().back().name;
-    std::string enemyMonsterImagePath = "assets/images/" + enemyMonsterName + ".png";
-
-    if (enemyMonsterTexture.loadFromFile(enemyMonsterImagePath))
-    {
-        enemyMonsterSprite.setTexture(enemyMonsterTexture);
-        // Scale down by 50%
-        enemyMonsterSprite.setScale(-0.5f, 0.5f); // Negative x scale to flip horizontally
-        // Position the monster on the center right side
-        enemyMonsterSprite.setPosition(
-            screenWidth * 3 / 4 + (enemyMonsterSprite.getLocalBounds().width * 0.5f) / 2, // Adjusted for flipped sprite
-            screenHeight * 1 / 3 - (enemyMonsterSprite.getLocalBounds().height * 0.5f) / 2);
-        window.draw(enemyMonsterSprite);
-    }
-
-    std::string move1 = engine.menuOptions[0];
-    std::string move2 = engine.menuOptions[1];
-    std::string move3 = engine.menuOptions[2];
-    std::string switchMonster = engine.menuOptions[3];
-
-    sf::Text text(move1, font);
-    text.setCharacterSize(SQUARE_SIZE);
-    text.setPosition(screenWidth / 2 - text.getLocalBounds().width / 2,
-                     screenHeight * 3 / 4 - SQUARE_SIZE * 2);
-    if (selection == 0)
-    {
-        text.setFillColor(sf::Color::Yellow);
-    }
-    else
-    {
-        text.setFillColor(sf::Color::White);
-    }
-    window.draw(text);
-
-    sf::Text text2(move2, font);
-    text2.setCharacterSize(SQUARE_SIZE);
-    text2.setPosition(screenWidth * 1 / 4 - text2.getLocalBounds().width / 2,
-                      screenHeight * 3 / 4);
-    if (selection == 1)
-    {
-        text2.setFillColor(sf::Color::Yellow);
-    }
-    else
-    {
-        text2.setFillColor(sf::Color::White);
-    }
-    window.draw(text2);
-
-    sf::Text text3(move3, font);
-    text3.setCharacterSize(SQUARE_SIZE);
-    text3.setPosition(screenWidth * 3 / 4 - text3.getLocalBounds().width / 2,
-                      screenHeight * 3 / 4);
-    if (selection == 2)
-    {
-        text3.setFillColor(sf::Color::Yellow);
-    }
-    else
-    {
-        text3.setFillColor(sf::Color::White);
-    }
-    window.draw(text3);
-
-    sf::Text text4(switchMonster, font);
-    text4.setCharacterSize(SQUARE_SIZE);
-    text4.setPosition(screenWidth / 2 - text4.getLocalBounds().width / 2,
-                      screenHeight * 3 / 4 + SQUARE_SIZE);
-    if (selection == 3)
-    {
-        text4.setFillColor(sf::Color::Yellow);
-    }
-    else
-    {
-        text4.setFillColor(sf::Color::White);
-    }
-    window.draw(text4);
-}
-
-void Render::drawTestBattle(sf::RenderWindow &window, Player &player, MonsterManager &monsterManager, Engine &engine, Environment &environment, int &selection)
-{
-    int screenWidth = MAP_WIDTH * SQUARE_SIZE;
-    int screenHeight = MAP_HEIGHT * SQUARE_SIZE;
-
-    // Use the actual monsters instead of creating new ones
-    std::vector<Monster> playerMonsters = player.getActiveMonsters();
-    std::vector<Monster> enemyMonsters = environment.getEnemyMonsters();
 
     // Define positions for triangle formation
     std::vector<sf::Vector2f> leftPositions = {
@@ -281,17 +174,17 @@ void Render::drawTestBattle(sf::RenderWindow &window, Player &player, MonsterMan
     };
 
     // Helper function to draw resource bars
-    auto drawResourceBars = [&](float x, float y, const Monster &monster)
+    auto drawResourceBars = [&](float x, float y, Monster &monster)
     {
         const float BAR_WIDTH = 60.0f;
         const float BAR_HEIGHT = 5.0f;
         const float BAR_SPACING = 2.0f;
-
+        ;
         // HP Bar (Green)
         sf::RectangleShape hpBar(sf::Vector2f(BAR_WIDTH, BAR_HEIGHT));
         hpBar.setFillColor(sf::Color::Green);
         hpBar.setPosition(x - BAR_WIDTH / 2, y);
-        float hpRatio = static_cast<float>(monster.currentHealth) / monster.health;
+        float hpRatio = static_cast<float>(monster.currentStats.health) / monster.baseStats.health;
         hpBar.setScale(hpRatio, 1.0f);
         window.draw(hpBar);
 
@@ -299,23 +192,23 @@ void Render::drawTestBattle(sf::RenderWindow &window, Player &player, MonsterMan
         sf::RectangleShape mpBar(sf::Vector2f(BAR_WIDTH, BAR_HEIGHT));
         mpBar.setFillColor(sf::Color::Blue);
         mpBar.setPosition(x - BAR_WIDTH / 2, y + BAR_HEIGHT + BAR_SPACING);
-        mpBar.setScale(static_cast<float>(monster.currentMovePoints) / 1000, 1.0f); // Starts at 0
+        mpBar.setScale(static_cast<float>(monster.movePoints) / (monster.currentStats.specialAttack * 5), 1.0f);
         window.draw(mpBar);
 
         // TP Bar (Yellow)
         sf::RectangleShape tpBar(sf::Vector2f(BAR_WIDTH, BAR_HEIGHT));
         tpBar.setFillColor(sf::Color::Yellow);
         tpBar.setPosition(x - BAR_WIDTH / 2, y + (BAR_HEIGHT + BAR_SPACING) * 2);
-        tpBar.setScale(static_cast<float>(monster.currentTurnPoints) / 1000, 1.0f); // Starts at 0
+        tpBar.setScale(static_cast<float>(monster.turnPoints) / 1000, 1.0f);
         window.draw(tpBar);
     };
 
     // Draw player monsters
-    for (size_t i = 0; i < playerMonsters.size() && i < leftPositions.size(); i++)
+    for (size_t i = 0; i < player.getActiveMonsters().size() && i < leftPositions.size(); i++)
     {
         sf::Texture texture;
         sf::Sprite sprite;
-        std::string imagePath = "assets/images/" + playerMonsters[i].name + ".png";
+        std::string imagePath = "assets/images/" + player.getActiveMonsters()[i].baseStats.name + ".png";
 
         if (texture.loadFromFile(imagePath))
         {
@@ -324,20 +217,28 @@ void Render::drawTestBattle(sf::RenderWindow &window, Player &player, MonsterMan
             sprite.setPosition(
                 leftPositions[i].x - (sprite.getLocalBounds().width * 0.2f) / 2,
                 leftPositions[i].y - (sprite.getLocalBounds().height * 0.2f) / 2);
+
+            // Set opacity based on monster health
+            sf::Color spriteColor = sf::Color::White;
+            if (player.getActiveMonsters()[i].currentStats.health <= 0)
+            {
+                spriteColor.a = 75; // 50% opacity for defeated monsters
+            }
+            sprite.setColor(spriteColor);
             window.draw(sprite);
 
             // Draw resource bars below the sprite
             float barY = leftPositions[i].y + (sprite.getLocalBounds().height * 0.2f) / 2 + 5;
-            drawResourceBars(leftPositions[i].x, barY, playerMonsters[i]);
+            drawResourceBars(leftPositions[i].x, barY, player.getActiveMonsters()[i]);
         }
     }
 
     // Draw enemy monsters
-    for (size_t i = 0; i < enemyMonsters.size() && i < rightPositions.size(); i++)
+    for (size_t i = 0; i < environment.getEnemyMonsters().size() && i < rightPositions.size(); i++)
     {
         sf::Texture texture;
         sf::Sprite sprite;
-        std::string imagePath = "assets/images/" + enemyMonsters[i].name + ".png";
+        std::string imagePath = "assets/images/" + environment.getEnemyMonsters()[i].baseStats.name + ".png";
 
         if (texture.loadFromFile(imagePath))
         {
@@ -346,11 +247,19 @@ void Render::drawTestBattle(sf::RenderWindow &window, Player &player, MonsterMan
             sprite.setPosition(
                 rightPositions[i].x + (sprite.getLocalBounds().width * 0.2f) / 2,
                 rightPositions[i].y - (sprite.getLocalBounds().height * 0.2f) / 2);
+
+            // Set opacity based on monster health
+            sf::Color spriteColor = sf::Color::White;
+            if (environment.getEnemyMonsters()[i].currentStats.health <= 0)
+            {
+                spriteColor.a = 75; // 50% opacity for defeated monsters
+            }
+            sprite.setColor(spriteColor);
             window.draw(sprite);
 
             // Draw resource bars below the sprite
             float barY = rightPositions[i].y + (sprite.getLocalBounds().height * 0.2f) / 2 + 5;
-            drawResourceBars(rightPositions[i].x, barY, enemyMonsters[i]);
+            drawResourceBars(rightPositions[i].x, barY, environment.getEnemyMonsters()[i]);
         }
     }
 

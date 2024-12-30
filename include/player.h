@@ -19,6 +19,7 @@ public:
     int getSteps() const;
     void setSteps(int newSteps);
     void updateActiveMonsters(std::vector<Monster> newMonsters);
+    std::vector<Monster> getBattleMonsters();
 
 private:
     int x = 0;

@@ -52,9 +52,7 @@ void Environment::removeEnemyMonster(Monster monster)
 {
     for (auto it = enemyMonsters.begin(); it != enemyMonsters.end(); ++it)
     {
-        if (it->id == monster.id &&
-            it->name == monster.name &&
-            it->element == monster.element)
+        if (it->currentStats.uid == monster.currentStats.uid)
         {
             enemyMonsters.erase(it);
             break;
