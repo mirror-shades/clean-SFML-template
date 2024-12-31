@@ -25,7 +25,7 @@ public:
 
 private:
     std::vector<BattleTurn> battleHistory;
-
+    int findIndexInTeam(const Monster &monster, const std::vector<Monster> &team);
     void addTurn(BattleTurn turn);
     void clearBattleHistory();
     BattleTurn getLastTurn();

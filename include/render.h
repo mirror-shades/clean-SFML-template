@@ -34,7 +34,9 @@ public:
     void drawAttackMenu(int &selection, int screenWidth, int screenHeight, std::vector<std::string> menuOptions);
     bool isAnimating();
     void updateAnimation(float deltaTime);
+    void queueAttackSequence(AnimationState attackDirection, int sourceIndex, int targetIndex);
     BattleAnimation *getCurrentAnimation();
+    std::vector<BattleAnimation> getAnimationQueue();
     void queueAnimation(AnimationState state, int source, int target, float duration);
     void setReferences(sf::RenderWindow &w, MapHandler &m, Player &p,
                        MonsterManager &mm, Environment &env, Battle &b);

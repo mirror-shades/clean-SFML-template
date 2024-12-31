@@ -407,34 +407,32 @@ void Render::drawBattleWithAnimation(const BattleAnimation &anim,
     const float ATTACK_DISTANCE = 50.0f;
     const float BOUNCE_HEIGHT = 10.0f;
 
+    // Reset all positions to original before processing new animation
+    leftPositions = leftOriginalPositions;
+    rightPositions = rightOriginalPositions;
+
     switch (anim.state)
     {
     case ATTACK_RIGHT:
     {
-        // Attacker is on the left, moves to the right
         if (anim.sourceIndex < leftPositions.size())
         {
             float t = anim.elapsed / anim.duration;
-            float wave = sin(t * 3.14159f);
+            float wave = sin(t * M_PI); // Use full sine wave
             float offsetX = ATTACK_DISTANCE * wave;
-
-            leftPositions[anim.sourceIndex].x =
-                leftOriginalPositions[anim.sourceIndex].x + offsetX;
+            leftPositions[anim.sourceIndex].x = leftOriginalPositions[anim.sourceIndex].x + offsetX;
         }
         break;
     }
 
     case ATTACK_LEFT:
     {
-        // Attacker is on the right, moves to the left
         if (anim.sourceIndex < rightPositions.size())
         {
             float t = anim.elapsed / anim.duration;
-            float wave = sin(t * 3.14159f);
+            float wave = sin(t * M_PI); // Use full sine wave
             float offsetX = ATTACK_DISTANCE * wave;
-
-            rightPositions[anim.sourceIndex].x =
-                rightOriginalPositions[anim.sourceIndex].x - offsetX;
+            rightPositions[anim.sourceIndex].x = rightOriginalPositions[anim.sourceIndex].x - offsetX;
         }
         break;
     }
@@ -442,15 +440,14 @@ void Render::drawBattleWithAnimation(const BattleAnimation &anim,
     case DEFENDING:
     {
         float t = anim.elapsed / anim.duration;
-        float wave = sin(t * 3.14159f);
+        float wave = sin(t * M_PI); // Use full sine wave
         float offsetY = BOUNCE_HEIGHT * wave;
 
         // Check if it's a player monster or an enemy monster
         if (anim.targetIndex < leftPositions.size())
         {
             // Player monster bounce
-            leftPositions[anim.targetIndex].y =
-                leftOriginalPositions[anim.targetIndex].y + offsetY;
+            leftPositions[anim.targetIndex].y = leftOriginalPositions[anim.targetIndex].y + offsetY;
         }
         else
         {
@@ -458,8 +455,7 @@ void Render::drawBattleWithAnimation(const BattleAnimation &anim,
             int rightIndex = anim.targetIndex - leftPositions.size();
             if (rightIndex < rightPositions.size())
             {
-                rightPositions[rightIndex].y =
-                    rightOriginalPositions[rightIndex].y + offsetY;
+                rightPositions[rightIndex].y = rightOriginalPositions[rightIndex].y + offsetY;
             }
         }
         break;
@@ -500,4 +496,25 @@ void Render::resetBattlePositions()
 {
     leftPositions.clear();
     rightPositions.clear();
+}
+
+std::vector<BattleAnimation> Render::getAnimationQueue()
+{
+    return animationQueue;
+}
+
+void Render::queueAttackSequence(AnimationState attackDirection, int sourceIndex, int targetIndex)
+{
+    // Clear any existing animations
+    animationQueue.clear();
+
+    // Queue the sequence:
+    // 1. Attack animation
+    queueAnimation(attackDirection, sourceIndex, targetIndex, 0.3f);
+
+    // 2. Defend/hit animation
+    queueAnimation(AnimationState::DEFENDING, targetIndex, targetIndex, 0.3f);
+
+    // 3. Return to idle
+    queueAnimation(AnimationState::IDLE, sourceIndex, targetIndex, 0.2f);
 }

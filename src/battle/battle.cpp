@@ -29,36 +29,22 @@ std::vector<BattleTurn> Battle::getBattleHistory()
 
 void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, std::vector<Monster> &enemyTeam)
 {
-    // Combine both teams into a single vector for targeting
-    std::vector<Monster> allMonsters;
-    allMonsters.insert(allMonsters.end(), playerTeam.begin(), playerTeam.end());
-    allMonsters.insert(allMonsters.end(), enemyTeam.begin(), enemyTeam.end());
-
-    // Find attacker index in combined vector
-    int attackerIndex = -1;
-    for (size_t i = 0; i < allMonsters.size(); i++)
-    {
-        if (allMonsters[i].currentStats.uid == attacker.currentStats.uid)
-        {
-            attackerIndex = i;
-            break;
-        }
-    }
-
-    if (attackerIndex == -1)
-    {
-        std::cout << "Error: Attacker not found in combined team vector!" << std::endl;
-        return;
-    }
-
     // Get valid targets based on move's targeting type
     std::vector<Monster *> validTargets;
-    for (size_t i = 0; i < allMonsters.size(); i++)
+
+    // Get pointers to actual team monsters, not copies
+    for (auto &monster : playerTeam)
     {
-        Monster &target = allMonsters[i];
-        if (target.currentStats.health > 0 && target.currentStats.faction != attacker.currentStats.faction)
+        if (monster.currentStats.health > 0 && monster.currentStats.faction != attacker.currentStats.faction)
         {
-            validTargets.push_back(&allMonsters[i]);
+            validTargets.push_back(&monster);
+        }
+    }
+    for (auto &monster : enemyTeam)
+    {
+        if (monster.currentStats.health > 0 && monster.currentStats.faction != attacker.currentStats.faction)
+        {
+            validTargets.push_back(&monster);
         }
     }
 
@@ -111,20 +97,6 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
     // Execute the move on all valid targets
     for (auto *target : validTargets)
     {
-        // Find target index in combined vector
-        int targetIndex = -1;
-        for (size_t i = 0; i < allMonsters.size(); i++)
-        {
-            if (allMonsters[i].currentStats.uid == target->currentStats.uid)
-            {
-                targetIndex = i;
-                break;
-            }
-        }
-
-        if (targetIndex == -1)
-            continue;
-
         // ======================
         // ACCURACY CHECK
         // ======================
@@ -142,16 +114,22 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
             std::cout << "BATTLE EXECUTEAIMOVE: Move missed!" << std::endl;
             if (onAnimationRequested)
             {
-                // 1. Choose attack animation based on faction
+                // Animation code for miss...
                 AnimationState attackAnim = (attacker.currentStats.faction == Faction::PLAYER)
                                                 ? AnimationState::ATTACK_RIGHT
                                                 : AnimationState::ATTACK_LEFT;
 
-                // 2. Attacker does the attack animation (but it misses)
-                onAnimationRequested(attackAnim, attackerIndex, targetIndex, 0.5f);
+                int sourceIndex = (attacker.currentStats.faction == Faction::PLAYER)
+                                      ? findIndexInTeam(attacker, playerTeam)
+                                      : findIndexInTeam(attacker, enemyTeam);
 
-                // 3. Small delay, then return attacker to idle
-                onAnimationRequested(AnimationState::IDLE, attackerIndex, targetIndex, 0.2f);
+                int targetIndex = (target->currentStats.faction == Faction::PLAYER)
+                                      ? findIndexInTeam(*target, playerTeam)
+                                      : findIndexInTeam(*target, enemyTeam) + playerTeam.size();
+
+                onAnimationRequested(attackAnim, sourceIndex, targetIndex, 0.3f);
+                onAnimationRequested(AnimationState::DEFENDING, targetIndex, targetIndex, 0.3f);
+                onAnimationRequested(AnimationState::IDLE, sourceIndex, targetIndex, 0.2f);
             }
         }
         else
@@ -161,35 +139,29 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
             // ==================
             if (onAnimationRequested)
             {
-                // 1. Choose attack animation based on faction
+                // Animation code for hit...
                 AnimationState attackAnim = (attacker.currentStats.faction == Faction::PLAYER)
                                                 ? AnimationState::ATTACK_RIGHT
                                                 : AnimationState::ATTACK_LEFT;
 
-                // 2. Attacker does the attack animation
-                // If it's an enemy (right side), adjust the index
-                int sourceIndex = attackerIndex;
-                if (attacker.currentStats.faction == Faction::ENEMY)
-                {
-                    sourceIndex = attackerIndex - playerTeam.size();
-                }
+                int sourceIndex = (attacker.currentStats.faction == Faction::PLAYER)
+                                      ? findIndexInTeam(attacker, playerTeam)
+                                      : findIndexInTeam(attacker, enemyTeam);
 
-                // If target is an enemy, adjust the target index
-                int defenderIndex = targetIndex;
-                if (target->currentStats.faction == Faction::ENEMY)
-                {
-                    defenderIndex = targetIndex - playerTeam.size();
-                }
+                int targetIndex = (target->currentStats.faction == Faction::PLAYER)
+                                      ? findIndexInTeam(*target, playerTeam)
+                                      : findIndexInTeam(*target, enemyTeam) + playerTeam.size();
 
-                onAnimationRequested(attackAnim, sourceIndex, defenderIndex, 0.3f);
-                onAnimationRequested(AnimationState::DEFENDING, defenderIndex, defenderIndex, 0.3f);
-                onAnimationRequested(AnimationState::IDLE, sourceIndex, defenderIndex, 0.2f);
+                onAnimationRequested(attackAnim, sourceIndex, targetIndex, 0.3f);
+                onAnimationRequested(AnimationState::DEFENDING, targetIndex, targetIndex, 0.3f);
+                onAnimationRequested(AnimationState::IDLE, sourceIndex, targetIndex, 0.2f);
             }
 
             // ==================
             // DAMAGE CALCULATION
             // ==================
             float typeModifier = getTypeEffectiveness(move.element, target->currentStats.element);
+            std::cout << "Type modifier: " << typeModifier << std::endl;
 
             int attackStat = (move.type == MoveType::SPECIAL)
                                  ? attacker.currentStats.specialAttack
@@ -202,25 +174,23 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
             float stabBonus = (move.element == attacker.currentStats.element) ? 1.4f : 1.0f;
 
             float modifiedDamage = baseDamage * typeModifier * stabBonus;
-
             float random = 0.9f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (0.3f)));
             modifiedDamage *= random;
 
             int damage = std::round(modifiedDamage);
-
             int critRoll = accuracy_roll(gen);
             bool isCritical = (critRoll <= 10);
+
             if (isCritical)
             {
                 damage = static_cast<int>(damage * 1.4f);
             }
 
+            // Apply damage directly to the target monster
             int oldHealth = target->currentStats.health;
             target->currentStats.health = std::max(0, target->currentStats.health - damage);
 
-            // ==================
-            // LOGGING RESULTS
-            // ==================
+            // Log results...
             std::string attackerFaction = (attacker.currentStats.faction == Faction::PLAYER) ? "Allied" : "Enemy";
             std::string targetFaction = (target->currentStats.faction == Faction::PLAYER) ? "Allied" : "Enemy";
 
@@ -246,6 +216,19 @@ void Battle::executeAIMove(Monster &attacker, std::vector<Monster> &playerTeam, 
             std::cout << oldHealth << " -> " << target->currentStats.health << std::endl;
         }
     }
+}
+
+// Helper function to find a monster's index in a team
+int Battle::findIndexInTeam(const Monster &monster, const std::vector<Monster> &team)
+{
+    for (size_t i = 0; i < team.size(); i++)
+    {
+        if (team[i].currentStats.uid == monster.currentStats.uid)
+        {
+            return i;
+        }
+    }
+    return 0;
 }
 
 float Battle::getTypeEffectiveness(ElementType moveType, ElementType targetType)
